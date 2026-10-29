@@ -14,7 +14,23 @@ A small React portal for managing golf courses, built as a take-home assignment 
 
 ## Setup
 
-_To be added once the project is scaffolded._
+Tested on Node 24.
+
+```sh
+npm install
+npx playwright install chromium
+npm run dev
+```
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server at http://localhost:5173 |
+| `npm run build` | Typecheck and production build |
+| `npm run preview` | Serve the production build |
+| `npm run typecheck` | TypeScript (strict) |
+| `npm run lint` | ESLint |
+| `npm test` | Unit and component tests (Vitest) |
+| `npx playwright test` | End-to-end tests; starts the dev server itself |
 
 ## Assumptions
 
