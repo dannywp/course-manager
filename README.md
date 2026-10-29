@@ -30,7 +30,7 @@ npm run dev
 | `npm run typecheck` | TypeScript (strict) |
 | `npm run lint` | ESLint |
 | `npm test` | Unit and component tests (Vitest) |
-| `npx playwright test` | End-to-end tests; starts the dev server itself |
+| `npm run test:e2e` | End-to-end tests (Playwright); starts the dev server itself |
 
 ## Assumptions
 

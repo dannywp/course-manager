@@ -20,7 +20,7 @@ Keep changes small and in scope: no extra features, dependencies or abstractions
 React 19, Vite, TypeScript (`strict: true`), React Router (lazy routes), React Query,
 React Hook Form + Zod (`zodResolver`), Vitest + React Testing Library, Playwright, `idb-keyval`.
 
-npm scripts (created in Slice 0): `typecheck`, `lint`, `test`, `build`, `preview`, and Playwright via `npx playwright test`.
+npm scripts (created in Slice 0): `typecheck`, `lint`, `test`, `build`, `preview`, and Playwright via `test:e2e`.
 
 ## Architecture rules
 
@@ -50,7 +50,7 @@ npm scripts (created in Slice 0): `typecheck`, `lint`, `test`, `build`, `preview
 
 ## Definition of done (per slice)
 
-- [ ] `npm run typecheck`, `npm run lint` and `npm test` pass (plus `npx playwright test` once e2e tests exist).
+- [ ] `npm run typecheck`, `npm run lint` and `npm test` pass (plus `npm run test:e2e` once e2e tests exist).
 - [ ] Every acceptance criterion of the slice is met, and you can say how each one was checked.
 - [ ] UI is checked in the browser (Playwright MCP against `npm run dev`) at the widths the AC names,
       and compared with the local references in `docs/figma/screens/` and `docs/figma/spec.md`.
