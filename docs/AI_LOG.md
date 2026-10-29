@@ -30,3 +30,31 @@ I had the plan reviewed in a separate Claude session acting as a critical review
 **Takeaway:** the agent was fast at extracting design data and listing states. But it didn't cross-check its own numbers (tokens against breakpoints) or follow state through a refresh. Both needed a human pass. Review has to check what actually changed in the files, not the agent's summary of what changed.
 
 Time: 2 hours
+
+## 2026-10-29: Claude Code harness
+
+**Tools:** Claude Code (Opus) in plan mode, then auto mode, with the current Claude Code docs for hooks, subagents and slash commands.
+
+**What the agent did:**
+- Read PLAN.md, DECISIONS.md and ASSUMPTIONS.md.
+- Checked the current Claude Code docs for the hook, subagent and command formats instead of writing them from memory.
+- Wrote `CLAUDE.md` as a short router: stack, service-layer rules (D3), slice workflow, definition of done, commit rules and pointers to the docs.
+- Added two hooks in `.claude/settings.json`:
+  - After file edits, run typecheck and lint. It is a no-op until `package.json` exists and skips non-code files.
+  - Before `git commit`, block subjects that aren't Conventional Commits.
+- Added three subagents (`reviewer` and `a11y-auditor`, both read-only, and `test-writer`) and two commands: `/slice <n>`, which stops for approval after the plan and before committing, and `/review`.
+- Tested both hook scripts with sample inputs: valid and invalid subjects, multi-line messages, `--amend --no-edit`, no `package.json`, and a failing typecheck in a scratch project.
+
+**Review and corrections**
+- I added three rules to `CLAUDE.md`:
+  - The a11y-auditor must run for the slices with menus, modals or forms (3, 4, 6).
+  - AI_LOG entries are drafted by the agent and reviewed and edited by me before commit.
+  - DECISIONS.md and the PLAN.md acceptance criteria don't change without my approval. A wrong-looking AC is raised instead.
+- I asked what `.claude-home/` was. The agent found it was a leftover Claude Code config directory from an earlier session that installed the Figma plugin and Playwright MCP. Both now live in the normal config, and nothing pointed at the directory any more. It was removed along with its gitignore entry.
+- The agent flagged that Slice 0 doesn't list ESLint, although the hook and the definition of done expect a `lint` script.
+
+**Hook test:** Tested the commit hook by attempting a commit with the message "stuff". It was blocked with a clear error. A valid Conventional Commit then went through.
+
+**Takeaway:** piped test inputs showed the scripts' logic. The real commit attempt showed that the hook is actually loaded and fires in the session.
+
+Time: about 15 minutes
