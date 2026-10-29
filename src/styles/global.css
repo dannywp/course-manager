@@ -1,0 +1,17 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-lighter-gray);
+  color: var(--color-text);
+  font: var(--font-body);
+}
+
+h1,
+p {
+  margin: 0;
+}

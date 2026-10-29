@@ -5,13 +5,13 @@ Brief: [ASSIGNMENT.md](ASSIGNMENT.md) · Decisions: [DECISIONS.md](DECISIONS.md)
 Legend: **[C]** core, **[N]** nice-to-have. Each item states its acceptance criterion (AC). Tests are written in the slice whose behaviour they protect. Where a slice says test-first, the test is committed before or together with the code.
 
 ## Slice 0: Project skeleton [C]
-- [ ] Vite + React 19 + TypeScript with `strict: true`. AC: `npm run typecheck` passes, and `tsconfig` has `strict`.
-- [ ] React Router with lazy routes `/`, `/courses/new` and `/courses/:id/edit`. The form routes start as stubs. AC: the production build emits a separate chunk per route, and the network tab shows the form chunk loading only on navigation.
-- [ ] React Query provider, RHF, Zod, Vitest, React Testing Library and Playwright installed. AC: `npm test` and `npx playwright test` run, with zero tests allowed at this point.
-- [ ] ESLint flat config with typescript-eslint, eslint-plugin-react-hooks and eslint-plugin-jsx-a11y, plus an `npm run lint` script. AC: `npm run lint` passes on the skeleton.
-- [ ] Design tokens as CSS custom properties and the Inter font (400/600/700) loaded. AC: tokens match DESIGN_TOKENS.md, and the body renders in Inter.
-- [ ] App shell: dark top nav (48px) with logo and "FACILITY PORTAL", and a page header. AC: the shell matches the Figma Overview frame at 1440px.
-- [ ] Conventional Commits from the first commit. AC: `git log` subjects match `type(scope): subject`.
+- [x] Vite + React 19 + TypeScript with `strict: true`. AC: `npm run typecheck` passes, and `tsconfig` has `strict`.
+- [x] React Router with lazy routes `/`, `/courses/new` and `/courses/:id/edit`. The form routes start as stubs. AC: the production build emits a separate chunk per route, and the network tab shows the form chunk loading only on navigation.
+- [x] React Query provider, RHF, Zod, Vitest, React Testing Library and Playwright installed. AC: `npm test` and `npx playwright test` pass, each with one smoke test.
+- [x] ESLint flat config with typescript-eslint, eslint-plugin-react-hooks and eslint-plugin-jsx-a11y, plus an `npm run lint` script. AC: `npm run lint` passes on the skeleton.
+- [x] Design tokens as CSS custom properties and the Inter font (400/600/700) loaded. AC: tokens match DESIGN_TOKENS.md, and the body renders in Inter.
+- [x] App shell: dark top nav (48px) with logo and "FACILITY PORTAL", and a page header. AC: the shell matches the Figma Overview frame at 1440px.
+- [x] Conventional Commits from the first commit. AC: `git log` subjects match `type(scope): subject`.
 
 ## Slice 1: Data layer, business rules and ordering [C], test-first
 The service plays the role of the server. Business rules live in it, so no component or form duplicates them.

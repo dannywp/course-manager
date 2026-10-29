@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 104px;
+  padding-inline: var(--space-40);
+  background: var(--color-white);
+}
+
+.title {
+  font: var(--font-h1);
+}
+
+@media (width < 720px) {
+  .header {
+    min-height: 57px;
+    padding-inline: var(--space-16);
+    text-align: center;
+  }
+
+  .title {
+    font: var(--font-h2);
+  }
+
+  .subtitle {
+    display: none;
+  }
+}

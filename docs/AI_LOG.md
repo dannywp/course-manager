@@ -59,4 +59,29 @@ After reviewing CLAUDE.md in the separate Claude session, I made these changes:
 
 **Takeaway:** piped test inputs showed the scripts' logic. The real commit attempt showed that the hook is actually loaded and fires in the session.
 
-Time: about 15 minutes
+Time: about 30 minutes
+
+## 2026-10-29: Slice 0, project skeleton
+
+**Tools:** Claude Code (Opus) with `/slice 0`, plan mode, the Figma REST API, the Playwright MCP and the `reviewer` subagent.
+
+**What the agent did:**
+- Read the slice, the Figma Overview spec and the screenshots, then proposed a plan. It asked three questions first: how to load Inter, how to get the logo, and how to meet the Playwright AC with zero tests.
+- Scaffolded Vite + React 19 + strict TypeScript, React Router lazy routes (list plus two form stubs), React Query, RHF, Zod, Vitest/RTL, Playwright and an ESLint flat config with jsx-a11y.
+- Added design tokens as CSS custom properties, Inter through `@fontsource/inter`, and the app shell (top nav and page header, including the mobile header).
+- Exported the logomark once through the Figma REST API, because `nodes.json` has no vector geometry, and inlined it as JSX.
+- **Version conflicts:** the current Vite template ships oxlint and TypeScript 7. The agent checked peer dependencies before installing: typescript-eslint supports TypeScript below 6.1 and jsx-a11y supports ESLint up to 9. It pinned TS ~6.0 and ESLint 9 and replaced oxlint.
+- Checked in the browser against the production build:
+  - nav, header and type measurements at 1440px
+  - screenshots compared with `overview.png` and `mobile.png`
+  - the network log showing the form chunk loads only on client-side navigation
+  - `document.fonts.check` for Inter
+
+**Review and corrections**
+- I didn't accept a pass-with-no-tests flag for Playwright. I asked for one smoke test each in Vitest and Playwright and changed the Slice 0 AC to match.
+- The first Vitest run failed with two banner landmarks. The agent changed the page header from `<header>` to `<div>` to get past it. After review in the separate Claude session, I reverted that: under the HTML spec a `<header>` inside `<main>` has no banner role, so the markup was right and jsdom's role calculation was wrong. The test now finds the top nav by its text instead of relying on a single banner.
+- The `reviewer` subagent found leftover template comments, including a `/* Bundler mode */` label over a `nodenext` config, and a "Requires Node 24" claim the repo didn't back. It also flagged an unused `h2` reset. All were fixed. One finding was left as is: the e2e test asserting "FACILITY PORTAL" in uppercase. Kept: an e2e test checks what the user sees, and the design specifies uppercase.
+
+**Takeaway:** the scaffold template had changed since the plan was written, so checking peer dependencies before installing avoided a broken lint setup. When a test failed, the agent changed correct markup to satisfy a test-environment quirk instead of fixing the test. A green test run wasn't enough; the reasoning behind the fix had to be reviewed.
+
+Time: 45 minutes
