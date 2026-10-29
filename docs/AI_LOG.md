@@ -33,7 +33,7 @@ Time: 2 hours
 
 ## 2026-10-29: Claude Code harness
 
-**Tools:** Claude Code (Opus) in plan mode, then auto mode, with the current Claude Code docs for hooks, subagents and slash commands.
+**Tools:** Claude Code (Opus) auto mode, with the current Claude Code docs for hooks, subagents and slash commands.
 
 **What the agent did:**
 - Read PLAN.md, DECISIONS.md and ASSUMPTIONS.md.
@@ -46,12 +46,14 @@ Time: 2 hours
 - Tested both hook scripts with sample inputs: valid and invalid subjects, multi-line messages, `--amend --no-edit`, no `package.json`, and a failing typecheck in a scratch project.
 
 **Review and corrections**
+
+After reviewing CLAUDE.md in the separate Claude session, I made these changes:
 - I added three rules to `CLAUDE.md`:
   - The a11y-auditor must run for the slices with menus, modals or forms (3, 4, 6).
   - AI_LOG entries are drafted by the agent and reviewed and edited by me before commit.
   - DECISIONS.md and the PLAN.md acceptance criteria don't change without my approval. A wrong-looking AC is raised instead.
 - I asked what `.claude-home/` was. The agent found it was a leftover Claude Code config directory from an earlier session that installed the Figma plugin and Playwright MCP. Both now live in the normal config, and nothing pointed at the directory any more. It was removed along with its gitignore entry.
-- The agent flagged that Slice 0 doesn't list ESLint, although the hook and the definition of done expect a `lint` script.
+- The agent flagged that Slice 0 didn't list ESLint, although the hook and the definition of done expect a lint script. I approved adding it to Slice 0, with jsx-a11y, which also supports the accessibility requirements.
 
 **Hook test:** Tested the commit hook by attempting a commit with the message "stuff". It was blocked with a clear error. A valid Conventional Commit then went through.
 

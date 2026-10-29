@@ -8,6 +8,7 @@ Legend: **[C]** core, **[N]** nice-to-have. Each item states its acceptance crit
 - [ ] Vite + React 19 + TypeScript with `strict: true`. AC: `npm run typecheck` passes, and `tsconfig` has `strict`.
 - [ ] React Router with lazy routes `/`, `/courses/new` and `/courses/:id/edit`. The form routes start as stubs. AC: the production build emits a separate chunk per route, and the network tab shows the form chunk loading only on navigation.
 - [ ] React Query provider, RHF, Zod, Vitest, React Testing Library and Playwright installed. AC: `npm test` and `npx playwright test` run, with zero tests allowed at this point.
+- [ ] ESLint flat config with typescript-eslint, eslint-plugin-react-hooks and eslint-plugin-jsx-a11y, plus an `npm run lint` script. AC: `npm run lint` passes on the skeleton.
 - [ ] Design tokens as CSS custom properties and the Inter font (400/600/700) loaded. AC: tokens match DESIGN_TOKENS.md, and the body renders in Inter.
 - [ ] App shell: dark top nav (48px) with logo and "FACILITY PORTAL", and a page header. AC: the shell matches the Figma Overview frame at 1440px.
 - [ ] Conventional Commits from the first commit. AC: `git log` subjects match `type(scope): subject`.
