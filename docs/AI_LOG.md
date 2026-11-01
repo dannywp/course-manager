@@ -85,3 +85,31 @@ Time: about 30 minutes
 **Takeaway:** the scaffold template had changed since the plan was written, so checking peer dependencies before installing avoided a broken lint setup. When a test failed, the agent changed correct markup to satisfy a test-environment quirk instead of fixing the test. A green test run wasn't enough; the reasoning behind the fix had to be reviewed.
 
 Time: 45 minutes
+
+## 2026-11-01: Slice 1, data layer and business rules
+
+**Tools:** Claude Code (Opus) with `/slice 1`, plan mode, the Figma REST API, the Playwright MCP, the `reviewer` subagent and a second review through the `requesting-code-review` skill.
+
+**What the agent did:**
+- Read the slice and its decisions, then proposed a plan. It asked three questions first: how to break sort ties, where the failure switches live given that only the service may touch storage, and how to get seed images without the Figma MCP.
+- Wrote the `sortCourses` and `applySave` tests first, then the code.
+- Added the `Course` schema, a localStorage service with seeding, simulated latency and three failure switches, and a "Demo controls" panel that ships in production builds.
+- Exported the card images through the Figma REST API. One of the six fills was the checkerboard placeholder, so the sixth seed course has no image.
+- No UI reads the service yet, so it imported the module from the dev server and checked in the browser:
+  - five `list()` calls took 615–827 ms
+  - a created course survived a reload
+  - "Fail list" in the panel made `list` and `get` reject, while `remove` still resolved
+  - the panel is present in `npm run build && npm run preview`
+
+**Review and corrections**
+- The agent dropped the `storage` and `failures` options from the plan I had approved and only told me afterwards. Only tests would have used them, so the code stayed as built, but the change should have been raised first.
+- I questioned `resolves.not.toThrow()` in a service test. On a resolved value the matcher checks nothing, so it became a plain `await`.
+- The `reviewer` subagent found that the brief's ordering example couldn't catch the obvious bug: its `createdAt` values gave the expected order even with `featuredAt` ignored. The agent shuffled the values, then broke the sort on a scratch copy to prove the test now fails.
+- The same review asked for tests of two mock behaviours. I questioned testing something a real service will replace. The test that failing calls wait for the latency was left out. The `remove` and latency tests stay, each with a comment to remove it when the mock goes.
+- The second review broke the code in 31 ways, and the tests caught 19. `update` persistence was untested: removing the write left everything green. A new test now catches that.
+- That review also found that `crypto.randomUUID` needs HTTPS or localhost. This is recorded as an assumption, not fixed in code, because `npm run dev` and `preview` bind to localhost. A palm-tree photo labelled as a Danish course was renamed.
+- I left the remaining findings as known issues. The Demo controls panel is a demo tool, so it can be a bit faulty: a collapsed panel hides active switches, and a corrupted switch value crashes the app. Corrupt course data can't be recovered from the UI, and the "Reset demo data" action in ASSUMPTIONS #21 has no slice yet.
+
+**Takeaway:** a test that fails because the module doesn't exist yet proves nothing about what it protects. The brief's ordering test went from red to green and still couldn't catch the obvious bug. Deliberately breaking the code is what showed the gaps. An approved plan is also a contract: if the agent changes it, it has to say so at that moment.
+
+Time: 1 hour

@@ -50,3 +50,12 @@ Each entry is written as **Question → Assumption**.
 28. Showing the meatball button on touch and keyboard. → Always visible when `hover: none`, and visible on `:focus-within`.
 29. Mobile header. → A centered title without the subtitle, as in the Figma mobile frame.
 30. Modal backdrop. → `rgba(34,34,34,0.5)` with no blur. The modal is full width minus 16px on mobile.
+
+**Data layer**
+
+31. Ordering ties. → Featured courses with the same `featuredAt` fall back to `createdAt` descending. Any remaining tie keeps the stored order.
+32. Unknown ids. → `get` resolves `null`, so the edit page can tell "not found" apart from a failed call. `update` rejects. `remove` succeeds, because the course is already gone.
+33. Where the failure switches live. → In `src/services/failure-switches.ts`, next to the service. "Only the service touches storage" means the service layer (`src/services/`). A failing call still waits for the simulated latency, so the loading state shows before the error.
+34. Demo controls. → A collapsed "Demo controls" panel fixed to the bottom right on every page, with a dashed border to set it apart from the product UI.
+35. Seed data. → Six courses, two of them featured. The photos are the five course images from Figma, cropped to the card aspect ratio in `/public/seed`. The sixth course has no image, so the placeholder shows from the start. The Figma checkerboard fill is the placeholder, not a course photo.
+36. Where the app can run. → On localhost or HTTPS only. Course ids come from `crypto.randomUUID`, which browsers expose only in secure contexts. On a plain-HTTP origin, such as `vite --host` opened from a phone, seeding fails and every service call rejects.

@@ -15,22 +15,22 @@ Legend: **[C]** core, **[N]** nice-to-have. Each item states its acceptance crit
 
 ## Slice 1: Data layer, business rules and ordering [C], test-first
 The service plays the role of the server. Business rules live in it, so no component or form duplicates them.
-- [ ] `Course` type and Zod schema:
+- [x] `Course` type and Zod schema:
   - `id`, `name`, `city`, `countryCode`, `par`, `difficulty` (1–5), `featured`
   - `featuredAt: number | null`, `createdAt`, `updatedAt`, `imageId: string | null`
 
   AC: the schema rejects invalid shapes.
-- [ ] Pure `sortCourses()`: featured courses first by `featuredAt` ascending, then the rest by `createdAt` descending. **Tests first:** the brief's feat1–feat4 example, mixed lists, ties.
-- [ ] Pure `applySave(previous | null, input, now)` stamps the timestamps:
+- [x] Pure `sortCourses()`: featured courses first by `featuredAt` ascending, then the rest by `createdAt` descending. **Tests first:** the brief's feat1–feat4 example, mixed lists, ties.
+- [x] Pure `applySave(previous | null, input, now)` stamps the timestamps:
   - `createdAt` on create
   - `updatedAt` on every save
   - `featuredAt`: not featured → featured sets `now`; featured → featured keeps the old value; featured → not featured sets `null`
 
   **Tests first:** all three featured transitions, plus create-as-featured.
-- [ ] Service module (`coursesService`) with `list`, `get`, `create`, `update` and `remove`. It is the only module that touches storage. `list()` returns courses already sorted with `sortCourses`, and `create` and `update` call `applySave` with the service's clock. AC: no component sorts or stamps timestamps. Swapping in a fetch-based service changes only that module and its factory.
-- [ ] Course data in localStorage, seeded on first run with 6 courses. Seed images are static files in `/public/seed`, never stored in IndexedDB. AC: courses survive a refresh.
+- [x] Service module (`coursesService`) with `list`, `get`, `create`, `update` and `remove`. It is the only module that touches storage. `list()` returns courses already sorted with `sortCourses`, and `create` and `update` call `applySave` with the service's clock. AC: no component sorts or stamps timestamps. Swapping in a fetch-based service changes only that module and its factory.
+- [x] Course data in localStorage, seeded on first run with 6 courses. Seed images are static files in `/public/seed`, never stored in IndexedDB. AC: courses survive a refresh.
 - [ ] Simulated latency of 600–900 ms per call, set to zero in tests. AC: loading states are visible in the UI for at least 500 ms.
-- [ ] Failure simulation: a visible toggle, clearly labelled as a demo control, with three switches persisted per browser. It ships in production builds, not gated behind `import.meta.env.DEV`:
+- [x] Failure simulation: a visible toggle, clearly labelled as a demo control, with three switches persisted per browser. It ships in production builds, not gated behind `import.meta.env.DEV`:
   - "fail list": `list` and `get` reject
   - "fail saves": `create` and `update` reject
   - "fail deletes": `remove` rejects
