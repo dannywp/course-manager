@@ -1,0 +1,126 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-height: 434px;
+  padding: var(--space-12) var(--space-12) var(--space-20);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+}
+
+.card:not(.skeleton):hover,
+.card:focus-within {
+  box-shadow: var(--shadow-soft);
+}
+
+.image {
+  position: relative;
+  aspect-ratio: 280 / 328;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-lighter-gray);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-12);
+  left: var(--space-12);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 20px;
+  padding-inline: var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  font: var(--font-trumpet);
+  letter-spacing: var(--letter-spacing-trumpet);
+  text-transform: uppercase;
+}
+
+.text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-inline: var(--space-8);
+}
+
+.location,
+.name {
+  padding-right: var(--space-32);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location {
+  color: var(--color-gray);
+}
+
+.name {
+  font: var(--font-body-bold);
+}
+
+.meta {
+  display: flex;
+  gap: var(--space-8);
+  color: var(--color-dark-gray);
+  font: var(--font-label);
+}
+
+.menuButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+}
+
+.card:hover .menuButton,
+.card:focus-within .menuButton {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .menuButton {
+    opacity: 1;
+  }
+}
+
+.bar {
+  height: 1lh;
+  border-radius: var(--radius-sm);
+  background: var(--color-lighter-gray);
+  font: var(--font-body);
+}
+
+.barLocation {
+  width: 40%;
+}
+
+.barName {
+  width: 70%;
+}
+
+.barMeta {
+  width: 40%;
+  font: var(--font-label);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    animation: pulse 1.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.5;
+  }
+}
