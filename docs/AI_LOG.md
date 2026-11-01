@@ -113,3 +113,36 @@ Time: 45 minutes
 **Takeaway:** a test that fails because the module doesn't exist yet proves nothing about what it protects. The brief's ordering test went from red to green and still couldn't catch the obvious bug. Deliberately breaking the code is what showed the gaps. An approved plan is also a contract: if the agent changes it, it has to say so at that moment.
 
 Time: 1 hour
+
+## 2026-11-01: Slice 2, courses list
+
+**Tools:** Claude Code (Opus) with `/slice 2`, the Playwright MCP and the `reviewer` subagent.
+
+**What the agent did:**
+- Read the slice, D1 and the Figma specs, then proposed a plan with five decisions for me: how tests get zero latency, how image URLs reach the card, room for the meatball button, whether to hide the top button in the empty state, and what a failed background refetch does to a loaded list.
+- Built the responsive grid, the course card, the skeleton, and the error and empty states. The "Create a course" button and the cards share one set of grid tracks through `subgrid`, so the button stays aligned above 1440px.
+- Made `list` and `get` return a resolved `imageUrl`. It covers seed images now, and Slice 6 adds blobs. The card never reads `imageId`.
+- Added one `vi.mock` in the test setup, so tests get a zero-latency service with no test code in production.
+- Checked in the browser with the Playwright MCP:
+  - columns and card widths at 12 widths, including both sides of each breakpoint
+  - no horizontal scroll at 320px
+  - hover, keyboard focus and a real touch context
+  - an 80-character name and a 60-character city
+  - null and broken images
+  - loading, error, Retry, empty and Create navigation
+  - screenshots compared with `overview.png` and `mobile.png`
+- Broke the code on purpose in 12 ways on a scratch copy to confirm the tests catch each one.
+
+**Review and corrections**
+- The agent proposed hiding the top "Create a course" button in the empty state to avoid showing it twice. I rejected that: a button users rely on shouldn't disappear, so the empty state shows two.
+- Measuring in the browser showed the skeleton was 10px shorter than a real card, so the page would jump when the list loaded. No test could see that. The bars now use the same type tokens as the text they stand in for.
+- Two of the agent's browser checks were invalid at first. Tab had landed on the second card while it measured the first, and Chrome ignored the `hover: none` emulation. It noticed both from the output and re-ran them against the right card and in a real touch context.
+- The deliberate breaks found dead code: an `isFetching` check that React Query made redundant. It was removed.
+- The `reviewer` subagent found that the placeholder was a CSS background no test could see. The card now renders one `<img>` with a fallback `src`, which is less code and testable.
+- The same review led to smaller fixes: skeleton cards had a hover shadow, the meatball button duplicated the shared button styles, the image URL tests read through `get` although the page uses `list`, and the card's 20px padding had no token.
+- I left two accessibility findings for Slice 7: the loading region has no text for screen readers, and clicking Retry drops keyboard focus to the top of the page.
+- The Figma token had expired, so the star and dots icons are hand-drawn SVGs, not exports.
+
+**Takeaway:** tests and the browser caught different problems. Only measuring in the browser showed the skeleton jump, and only asking "what would fail if this were removed?" showed the untestable placeholder and the dead code. Green tests on the first run weren't evidence on their own.
+
+Time: 30 minutes

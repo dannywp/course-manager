@@ -29,7 +29,7 @@ The service plays the role of the server. Business rules live in it, so no compo
   **Tests first:** all three featured transitions, plus create-as-featured.
 - [x] Service module (`coursesService`) with `list`, `get`, `create`, `update` and `remove`. It is the only module that touches storage. `list()` returns courses already sorted with `sortCourses`, and `create` and `update` call `applySave` with the service's clock. AC: no component sorts or stamps timestamps. Swapping in a fetch-based service changes only that module and its factory.
 - [x] Course data in localStorage, seeded on first run with 6 courses. Seed images are static files in `/public/seed`, never stored in IndexedDB. AC: courses survive a refresh.
-- [ ] Simulated latency of 600–900 ms per call, set to zero in tests. AC: loading states are visible in the UI for at least 500 ms.
+- [x] Simulated latency of 600–900 ms per call, set to zero in tests. AC: loading states are visible in the UI for at least 500 ms.
 - [x] Failure simulation: a visible toggle, clearly labelled as a demo control, with three switches persisted per browser. It ships in production builds, not gated behind `import.meta.env.DEV`:
   - "fail list": `list` and `get` reject
   - "fail saves": `create` and `update` reject
@@ -38,22 +38,22 @@ The service plays the role of the server. Business rules live in it, so no compo
   AC: each switch makes its calls reject deterministically, and the toggle is present in `npm run build && npm run preview`.
 
 ## Slice 2: Courses list [C]
-- [ ] `useCoursesQuery` reads `service.list()` and renders in the order the service returns. AC: the list shows seed data in featured order.
-- [ ] Responsive grid derived from the card minimum width (DECISIONS.md D1):
+- [x] `useCoursesQuery` reads `service.list()` and renders in the order the service returns. AC: the list shows seed data in featured order.
+- [x] Responsive grid derived from the card minimum width (DECISIONS.md D1):
   - below 720px: 1 column, 16px padding
   - 720–1055px: 2 columns, 40px padding
   - 1056–1391px: 3 columns
   - 1392px and up: 4 columns
 
   Tracks are `minmax(min(304px, 100%), 380px)` with a 32px gap. The card component sets no `min-width`. AC: at 402, 800, 1280 and 1440px the grid shows 1, 2, 3 and 4 columns, and from 720px up no card is narrower than 304px. At a 320px viewport there is no horizontal scroll.
-- [ ] Card shows the image (aspect 280/328), "City, CC", name, "Par N • Difficulty: N/5", and a FEATURED badge when featured. AC: renders match the Figma Card Default state.
-- [ ] Hover state: shadow plus a meatball button. The button is also visible on `:focus-within` and always visible on touch (`hover: none`). AC: tabbing into a card reveals the button.
-- [ ] Long text truncation: name and location are single-line with an ellipsis and the full text in `title`. AC: an 80-character name doesn't change the card height.
-- [ ] Placeholder image when a course has no image, or when its image fails to load. AC: a course with `imageId: null` and a course with a broken image source both show the placeholder.
-- [ ] Loading state: skeleton cards. AC: the skeleton shows during simulated latency.
-- [ ] Error state: a message with a Retry button. AC: with "fail list" on, the error shows. Turning it off and clicking Retry loads the list.
-- [ ] Empty state: text plus a "Create a course" call to action. AC: after deleting all courses, the empty state shows.
-- [ ] "Create a course" button navigates to `/courses/new`. AC: clicking it opens the form route.
+- [x] Card shows the image (aspect 280/328), "City, CC", name, "Par N • Difficulty: N/5", and a FEATURED badge when featured. AC: renders match the Figma Card Default state.
+- [x] Hover state: shadow plus a meatball button. The button is also visible on `:focus-within` and always visible on touch (`hover: none`). AC: tabbing into a card reveals the button.
+- [x] Long text truncation: name and location are single-line with an ellipsis and the full text in `title`. AC: an 80-character name doesn't change the card height.
+- [x] Placeholder image when a course has no image, or when its image fails to load. AC: a course with `imageId: null` and a course with a broken image source both show the placeholder.
+- [x] Loading state: skeleton cards. AC: the skeleton shows during simulated latency.
+- [x] Error state: a message with a Retry button. AC: with "fail list" on, the error shows. Turning it off and clicking Retry loads the list.
+- [x] Empty state: text plus a "Create a course" call to action. AC: after deleting all courses, the empty state shows.
+- [x] "Create a course" button navigates to `/courses/new`. AC: clicking it opens the form route.
 
 ## Slice 3: Card menu, delete modal and optimistic delete [C]
 - [ ] Per-card menu (Edit, Delete) as an accessible menu button:

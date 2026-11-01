@@ -30,7 +30,7 @@ Extracted from the Figma file (copy `04Q7EHGrcMmgsC4Q6lMeX5`). The raw reference
 | Trumpet | 11 / 700 / 10, uppercase, letter-spacing 0.22px (2%) | FEATURED badge, CARD PREVIEW label |
 | Nav product name | 12 / 600, uppercase, letter-spacing 2.88px (24%) | "FACILITY PORTAL" |
 
-**Spacing scale:** 1, 2, 4, 8, 12, 16, 24, 32 and 40px.
+**Spacing scale:** 1, 2, 4, 8, 12, 16, 20, 24, 32 and 40px.
 - Page padding is 40px on desktop and 16px on mobile.
 - The grid gap is 32px, and so is the gap between the button row and the grid.
 - Card padding is 12/12/20/12, with a 12px gap between image and text. The text block has 8px horizontal padding and 4px between rows. The meta row gap is 8px.

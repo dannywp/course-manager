@@ -59,3 +59,9 @@ Each entry is written as **Question → Assumption**.
 34. Demo controls. → A collapsed "Demo controls" panel fixed to the bottom right on every page, with a dashed border to set it apart from the product UI.
 35. Seed data. → Six courses, two of them featured. The photos are the five course images from Figma, cropped to the card aspect ratio in `/public/seed`. The sixth course has no image, so the placeholder shows from the start. The Figma checkerboard fill is the placeholder, not a course photo.
 36. Where the app can run. → On localhost or HTTPS only. Course ids come from `crypto.randomUUID`, which browsers expose only in secure contexts. On a plain-HTTP origin, such as `vite --host` opened from a phone, seeding fails and every service call rejects.
+
+**List page**
+
+37. Room for the meatball button. → Figma overlays it on the text block, so a long name would run under it. The location and name lines always reserve 32px on the right. Short names look the same as in Figma, and long ones truncate slightly earlier, with no jump on hover.
+38. A failed refetch with a list already loaded. → The list stays and no error shows, because a background failure shouldn't replace good data. The error state only shows when there is nothing to display, so "Fail list" takes effect on the next reload.
+39. Empty state. → The top "Create a course" button stays in every state, so the empty state shows two of them. Moving a button users rely on would be worse than the repetition.
