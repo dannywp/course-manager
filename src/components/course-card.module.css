@@ -75,20 +75,20 @@
   font: var(--font-label);
 }
 
-.menuButton {
+.actions {
   position: absolute;
   top: 0;
   right: 0;
   opacity: 0;
 }
 
-.card:hover .menuButton,
-.card:focus-within .menuButton {
+.card:hover .actions,
+.card:focus-within .actions {
   opacity: 1;
 }
 
 @media (hover: none) {
-  .menuButton {
+  .actions {
     opacity: 1;
   }
 }

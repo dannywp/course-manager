@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { CourseWithImage } from '../domain/course'
-import buttonStyles from './button.module.css'
 import styles from './course-card.module.css'
 
 type CourseCardProps = {
   course: Pick<CourseWithImage, 'name' | 'city' | 'countryCode' | 'par' | 'difficulty' | 'featured' | 'imageUrl'>
+  actions?: ReactNode
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({ course, actions }: CourseCardProps) {
   const { name, city, countryCode, par, difficulty, featured, imageUrl } = course
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
   const src = imageUrl === null || imageUrl === failedUrl ? '/placeholder.png' : imageUrl
@@ -38,17 +38,7 @@ export function CourseCard({ course }: CourseCardProps) {
           <span aria-hidden="true">•</span>
           <span>Difficulty: {difficulty}/5</span>
         </p>
-        <button
-          type="button"
-          className={`${buttonStyles.button} ${buttonStyles.icon} ${styles.menuButton}`}
-          aria-label={`Actions for ${name}`}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
-            <circle cx="2" cy="8" r="1.5" />
-            <circle cx="8" cy="8" r="1.5" />
-            <circle cx="14" cy="8" r="1.5" />
-          </svg>
-        </button>
+        {actions && <div className={styles.actions}>{actions}</div>}
       </div>
     </article>
   )

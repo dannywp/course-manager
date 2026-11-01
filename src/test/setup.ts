@@ -8,3 +8,18 @@ vi.mock('../services/courses-service', async () => {
 })
 
 afterEach(cleanup)
+
+// jsdom doesn't implement modal dialogs. Restoring focus on close matches what browsers do.
+let focusedBeforeModal: HTMLElement | null = null
+
+HTMLDialogElement.prototype.showModal = function () {
+  focusedBeforeModal = document.activeElement as HTMLElement
+  this.open = true
+}
+
+HTMLDialogElement.prototype.close = function () {
+  if (this.open) {
+    this.open = false
+    focusedBeforeModal?.focus()
+  }
+}

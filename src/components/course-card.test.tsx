@@ -73,3 +73,17 @@ describe('image', () => {
     expect(image()).toHaveAttribute('src', '/seed/st-andrews.jpg')
   })
 })
+
+describe('actions', () => {
+  it('renders what the caller passes', () => {
+    render(<CourseCard course={course} actions={<button type="button">Open</button>} />)
+
+    expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument()
+  })
+
+  it('renders no button without them, as in the form preview', () => {
+    render(<CourseCard course={course} />)
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+})

@@ -30,9 +30,27 @@
   color: var(--color-white);
 }
 
+.secondary {
+  background: var(--color-lighter-gray);
+  color: var(--color-text);
+}
+
+.danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+}
+
 .icon {
   width: 32px;
   padding: 0;
   background: var(--color-lighter-gray);
   color: var(--color-text);
+}
+
+.ghost {
+  background: none;
+}
+
+.ghost:hover {
+  background: var(--color-lighter-gray);
 }
