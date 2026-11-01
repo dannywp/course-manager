@@ -1,11 +1,11 @@
-import type { Course, CourseInput } from '../domain/course'
+import type { CourseInput, CourseWithImage } from '../domain/course'
 import { createLocalCoursesService } from './local-courses-service'
 
 export type CoursesService = {
-  list(): Promise<Course[]>
-  get(id: string): Promise<Course | null>
-  create(input: CourseInput): Promise<Course>
-  update(id: string, input: CourseInput): Promise<Course>
+  list(): Promise<CourseWithImage[]>
+  get(id: string): Promise<CourseWithImage | null>
+  create(input: CourseInput): Promise<CourseWithImage>
+  update(id: string, input: CourseInput): Promise<CourseWithImage>
   remove(id: string): Promise<void>
 }
 

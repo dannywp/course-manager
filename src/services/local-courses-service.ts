@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { courseInputSchema, courseSchema, type Course } from '../domain/course'
+import { courseInputSchema, courseSchema, type Course, type CourseWithImage } from '../domain/course'
 import { applySave, sortCourses } from './course-rules'
 import type { CoursesService } from './courses-service'
 import { readFailureSwitches, type FailureSwitches } from './failure-switches'
@@ -12,6 +12,11 @@ type Options = {
 
 const storageKey = 'course-manager:courses'
 const storedCoursesSchema = z.array(courseSchema)
+
+function withImageUrl(course: Course): CourseWithImage {
+  const imageUrl = course.imageId?.startsWith('seed:') ? `/seed/${course.imageId.slice('seed:'.length)}.jpg` : null
+  return { ...course, imageUrl }
+}
 
 export function createLocalCoursesService({
   latency = () => 600 + Math.random() * 300,
@@ -40,15 +45,19 @@ export function createLocalCoursesService({
   }
 
   return {
-    list: () => respond('list', () => sortCourses(read())),
+    list: () => respond('list', () => sortCourses(read()).map(withImageUrl)),
 
-    get: (id) => respond('list', () => read().find((course) => course.id === id) ?? null),
+    get: (id) =>
+      respond('list', () => {
+        const course = read().find((candidate) => candidate.id === id)
+        return course ? withImageUrl(course) : null
+      }),
 
     create: (input) =>
       respond('saves', () => {
         const course = { id: crypto.randomUUID(), ...applySave(null, courseInputSchema.parse(input), now()) }
         write([...read(), course])
-        return course
+        return withImageUrl(course)
       }),
 
     update: (id, input) =>
@@ -60,7 +69,7 @@ export function createLocalCoursesService({
         }
         const course = { id, ...applySave(previous, courseInputSchema.parse(input), now()) }
         write(courses.map((existing) => (existing.id === id ? course : existing)))
-        return course
+        return withImageUrl(course)
       }),
 
     remove: (id) =>

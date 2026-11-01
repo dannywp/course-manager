@@ -108,6 +108,22 @@ describe('get', () => {
   })
 })
 
+describe('image urls', () => {
+  it('resolves a seed image to its static path', async () => {
+    const service = createService()
+    const { id } = await service.create({ ...input, imageId: 'seed:pebble-beach' })
+
+    expect((await service.list()).find((course) => course.id === id)?.imageUrl).toBe('/seed/pebble-beach.jpg')
+  })
+
+  it('resolves a course without an image to null', async () => {
+    const service = createService()
+    const { id } = await service.create(input)
+
+    expect((await service.list()).find((course) => course.id === id)?.imageUrl).toBeNull()
+  })
+})
+
 // Mock-only behaviour: remove when a real service replaces the mock.
 describe('remove', () => {
   it('succeeds for an unknown id and leaves the stored courses alone', async () => {
