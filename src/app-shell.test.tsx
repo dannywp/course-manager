@@ -1,10 +1,9 @@
-import { render, screen } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router'
+import { screen } from '@testing-library/react'
 import { expect, it } from 'vitest'
-import { routes } from './router'
+import { renderApp } from './test/render-app'
 
 it('renders the lazy list route inside the app shell', async () => {
-  render(<RouterProvider router={createMemoryRouter(routes)} />)
+  renderApp()
 
   expect(await screen.findByRole('heading', { level: 1, name: 'Courses' })).toBeInTheDocument()
   expect(screen.getByText('Facility portal')).toBeInTheDocument()
