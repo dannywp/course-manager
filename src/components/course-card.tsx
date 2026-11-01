@@ -3,7 +3,8 @@ import type { CourseWithImage } from '../domain/course'
 import styles from './course-card.module.css'
 
 type CourseCardProps = {
-  course: Pick<CourseWithImage, 'name' | 'city' | 'countryCode' | 'par' | 'difficulty' | 'featured' | 'imageUrl'>
+  course: Pick<CourseWithImage, 'featured' | 'imageUrl'> &
+    Partial<Pick<CourseWithImage, 'name' | 'city' | 'countryCode' | 'par' | 'difficulty'>>
   actions?: ReactNode
 }
 
@@ -11,7 +12,8 @@ export function CourseCard({ course, actions }: CourseCardProps) {
   const { name, city, countryCode, par, difficulty, featured, imageUrl } = course
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
   const src = imageUrl === null || imageUrl === failedUrl ? '/placeholder.png' : imageUrl
-  const location = `${city}, ${countryCode}`
+  const location = `${city?.trim() || 'City'}, ${countryCode || 'Country'}`
+  const title = name?.trim()
 
   return (
     <article className={styles.card}>
@@ -30,13 +32,13 @@ export function CourseCard({ course, actions }: CourseCardProps) {
         <p className={styles.location} title={location}>
           {location}
         </p>
-        <h2 className={styles.name} title={name}>
-          {name}
+        <h2 className={`${styles.name} ${title ? '' : styles.placeholder}`} title={title}>
+          {title || 'Course name'}
         </h2>
         <p className={styles.meta}>
-          <span>Par {par}</span>
+          <span className={par === undefined ? styles.placeholder : undefined}>Par {par ?? '–'}</span>
           <span aria-hidden="true">•</span>
-          <span>Difficulty: {difficulty}/5</span>
+          <span className={difficulty === undefined ? styles.placeholder : undefined}>Difficulty: {difficulty ?? '–'}/5</span>
         </p>
         {actions && <div className={styles.actions}>{actions}</div>}
       </div>

@@ -74,6 +74,39 @@ describe('image', () => {
   })
 })
 
+describe('placeholders for a course still being filled in', () => {
+  const empty = { featured: false, imageUrl: null }
+
+  it('stand in for missing values', () => {
+    render(<CourseCard course={empty} />)
+
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Course name')
+    expect(screen.getByText('City, Country')).toBeInTheDocument()
+    expect(screen.getByText('Par –')).toBeInTheDocument()
+    expect(screen.getByText('Difficulty: –/5')).toBeInTheDocument()
+  })
+
+  it('treat a name or city of only spaces as missing', () => {
+    render(<CourseCard course={{ ...empty, name: '   ', city: '   ' }} />)
+
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Course name')
+    expect(screen.getByText('City, Country')).toBeInTheDocument()
+  })
+
+  it('fill in part by part', () => {
+    render(<CourseCard course={{ ...empty, countryCode: 'DK' }} />)
+
+    expect(screen.getByText('City, DK')).toBeInTheDocument()
+  })
+
+  it('are absent on a complete course', () => {
+    render(<CourseCard course={course} />)
+
+    expect(screen.queryByText('Course name')).not.toBeInTheDocument()
+    expect(screen.queryByText(/–/)).not.toBeInTheDocument()
+  })
+})
+
 describe('actions', () => {
   it('renders what the caller passes', () => {
     render(<CourseCard course={course} actions={<button type="button">Open</button>} />)

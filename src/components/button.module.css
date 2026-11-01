@@ -25,6 +25,12 @@
   box-shadow: var(--focus-glow);
 }
 
+.button:disabled {
+  background: var(--color-gray);
+  filter: none;
+  cursor: not-allowed;
+}
+
 .primary {
   background: var(--color-orange);
   color: var(--color-white);

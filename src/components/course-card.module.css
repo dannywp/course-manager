@@ -68,6 +68,10 @@
   font: var(--font-body-bold);
 }
 
+.placeholder {
+  color: var(--color-gray);
+}
+
 .meta {
   display: flex;
   gap: var(--space-8);
