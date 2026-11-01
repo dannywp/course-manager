@@ -75,8 +75,8 @@ The service plays the role of the server. Business rules live in it, so no compo
 - [x] **Rollback integration test** (React Testing Library with an in-memory service set to fail deletes). It asserts that the card is removed, then restored in the same position, and that the error is shown.
 
 ## Slice 4: Create form with live preview [C]
-- [ ] Two-column layout: the form on the left and a sticky preview with a `CARD PREVIEW` label on the right. Below 1024px it stacks, with the preview under the form and not sticky. AC: at 1440px the preview stays in view while the form scrolls.
-- [ ] Fields:
+- [x] Two-column layout: the form on the left and a sticky preview with a `CARD PREVIEW` label on the right. Below 1024px it stacks, with the preview under the form and not sticky. AC: at 1440px the preview stays in view while the form scrolls.
+- [x] Fields:
   - Name, required
   - Country select (15 countries)
   - Par, required integer
@@ -85,12 +85,12 @@ The service plays the role of the server. Business rules live in it, so no compo
   - City and Description (see ASSUMPTIONS.md)
 
   The image field arrives in Slice 6. AC: every field is reachable with the keyboard.
-- [ ] RHF with `zodResolver`, sharing the Slice 1 schema. AC: submitting empty shows an error per required field, and focus moves to the first invalid field.
-- [ ] Live preview through `watch`, rendering the same card component as the list. AC: typing in Name updates the preview title immediately.
-- [ ] Save in the top action bar, with a pending state while saving. AC: the button is disabled and shows "Saving…" while the mutation is pending, so a double click creates only one course.
-- [ ] On success, invalidate the list query and navigate to `/`. AC: the new course appears where the service's ordering puts it.
-- [ ] Save failure: an inline error banner, values kept. AC: with "fail saves" on, the form stays filled and shows the error.
-- [ ] [N] Schema test for par and difficulty bounds and name trimming.
+- [x] RHF with `zodResolver`, sharing the Slice 1 schema. AC: submitting empty shows an error per required field, and focus moves to the first invalid field.
+- [x] Live preview through `watch`, rendering the same card component as the list. AC: typing in Name updates the preview title immediately.
+- [x] Save in the top action bar, with a pending state while saving. AC: the button is disabled and shows "Saving…" while the mutation is pending, so a double click creates only one course.
+- [x] On success, invalidate the list query and navigate to `/`. AC: the new course appears where the service's ordering puts it.
+- [x] Save failure: an inline error banner, values kept. AC: with "fail saves" on, the form stays filled and shows the error.
+- [x] [N] Schema test for par and difficulty bounds and name trimming.
 
 ## Slice 5: Edit course [C]
 - [ ] Edit route loads `service.get(id)` and prefills the form. AC: every field shows the stored value.
@@ -155,7 +155,7 @@ The service plays the role of the server. Business rules live in it, so no compo
   - create vs edit page title
   - Cancel/back action
   - edit loading, not-found and fetch-error states
-- Field states: validation error (red border and message), hover, focus on text inputs and the textarea, disabled while saving.
+- Field states: validation error (red border and message), hover, focus on text inputs and the textarea. Fields stay enabled while saving (ASSUMPTIONS #55).
 - Save pending, save error banner.
 - Drop zone:
   - drag-over

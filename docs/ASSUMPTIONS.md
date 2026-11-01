@@ -13,7 +13,7 @@ Each entry is written as **Question → Assumption**.
 6. The editor header still reads "Courses / Browse and add golf courses" and has no Cancel. → The title reads "Create course" or "Edit course" with the same subtitle. A secondary Cancel button sits left of Save in the action bar.
 7. The drop zone copy says "images and videos", but the brief allows jpg/png/webp only. → "Drag & drop or click to browse. JPG, PNG or WebP, max 5 MB."
 8. Defaults differ between frames: Empty shows Difficulty "1" and Country "Denmark", while In progress shows "Choose an option". → No preselection. Both are required selects with a "Choose an option" placeholder.
-9. The preview shows sample data ("Pebble Beach…") while the form is empty. → Show neutral placeholders ("Course name", "City, Country", "Par –") in the grey text colour, with the checkerboard image placeholder.
+9. The preview shows sample data ("Pebble Beach…") while the form is empty. → Show neutral placeholders ("Course name", "City, Country", "Par –", "Difficulty: –/5") in the grey text colour, with the checkerboard image placeholder.
 10. The checkerboard placeholder is a transparency pattern. → Use it for the preview before upload and for cards without an image.
 11. The Selected and On Click menu item states use the Lato font. → Treat it as a stray and use Inter everywhere.
 
@@ -76,3 +76,14 @@ Each entry is written as **Question → Assumption**.
 45. Delete-failure notice. → "Couldn't delete {name}. It's back in the list." It's a toast fixed to the top right, so it stays in view when the list is scrolled down and the cards don't shift. It clears on dismiss, on the next delete attempt or when leaving the page, and it doesn't time out, so it can't disappear before it's read. Dismissing moves focus to the "Create a course" link without scrolling, so the page stays where the user is. It's a white toast with a red border and normal text colour, because red text at 13px would be below the 4.5:1 contrast minimum.
 46. Pencil, trash and close icons. → Hand-drawn SVGs, because `nodes.json` has no vector geometry.
 47. Overlapping deletes. → Known issue, accepted. The failure notice follows only the latest delete, so if a second delete starts while the first is running, a failure of the first may not be named: its card comes back with no notice, or only the second course is named if both fail. A card can also flicker until the last refetch. The list itself still ends up correct.
+
+**Course form**
+
+48. Dropdowns. → Native `<select>` elements, so keyboard and screen reader behaviour comes from the browser. Browsers with CSS `appearance: base-select` show the open list as in Figma, and others show their own OS list. Chromium also treats Enter on a closed select as submitting the form; Space and the arrow keys open it.
+49. Preview position. → The Figma frames place it at different heights. It starts level with the top of the form and sticks 40px from the top of the viewport.
+50. Save time. → "Saving…" stays until the list has refreshed, about twice the simulated latency, so the list is correct on arrival and the new course doesn't pop in afterwards.
+51. Validation errors. → A red border with the message in normal text colour, because red text at 11px on the grey page is below the 4.5:1 contrast minimum.
+52. Save failure. → "Couldn't save the course. Your changes are still here." A banner at the top of the form column that sticks to the top of the viewport, so it stays in view if Enter submits while scrolled down and can't cover the preview.
+53. Text field focus. → The orange border and glow of Figma's focused select, and the label floats on focus so it doesn't overlap typing.
+54. Par input. → A text input with a numeric keyboard, so there are no spinners and scrolling can't change the value. The "Typical: 68–74" hint sits under the field, so Featured sits about 20px lower than in Figma.
+55. Fields while saving. → They stay editable, and only Save and Cancel are disabled. Disabling a focused field drops keyboard focus to the page when a save fails. Cancel can't stop a save that has started, so it's disabled rather than left to imply it can. A save also finishes if the user leaves with the browser's Back button, and it then returns them to the list.

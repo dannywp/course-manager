@@ -178,3 +178,33 @@ Time: 30 minutes
 **Takeaway:** a passing test can hide a bug when another mechanism produces the same result. Deliberately removing code showed that here, and tightening the test found a user-visible delay that the browser check had shown and the agent had explained away. Using the feature also found what checks hadn't: a correct notice is no use if it's off screen.
 
 Time: 1.5 hours
+
+## 2026-11-01: Slice 4, create form with live preview
+
+**Tools:** Claude Code (Opus), the Playwright MCP, the `reviewer` subagent and the `requesting-code-review` skill.
+
+**What the agent did:**
+- Read the slice and the editor frames, then proposed a plan with six points for me to approve, including native selects styled with `appearance: base-select` instead of a hand-built dropdown.
+- Checked two assumptions before planning. One changed the design: `invalidateQueries` skips queries that aren't mounted, so following the AC literally would have shown the old list first. The save now waits for a fresh list.
+- Built a shared `CourseForm`, so Slice 5 can reuse it, plus field components with CSS-only floating labels. Validation messages went into the one shared schema. The card itself shows the empty-state placeholders, so the list and the preview stay one component.
+- Checked in Chromium with the Playwright MCP:
+  - the sticky preview at 1440px and stacking at 1023/1024px
+  - no horizontal scroll down to 320px
+  - Tab order, and choosing select options by keyboard
+  - a real double click at real latency
+  - the failure banner after pressing Enter while scrolled down
+  - screenshots compared with the three editor frames
+- Broke the code on purpose in 42 ways on a scratch copy to confirm the tests catch each one.
+
+**Review and corrections**
+- A failing test exposed a gap in the double-click protection. `handleSubmit` finished before `isPending` updated, so Save was briefly enabled and a second click could create a second course. The planned `saving` prop was removed, and RHF's `isSubmitting` now covers the whole save through `mutateAsync`.
+- Comparing the screenshots with Figma found problems no test could see: my `display: flex` on options overrode `hidden`, so "Choose an option" appeared in the list, an open select lost its orange border, and select values sat too high.
+- The first browser check looked like a keyboard bug, but it was Chromium treating Enter on a closed select as submitting the form. The agent tested Space and the arrow keys instead and recorded the behaviour.
+- The deliberate breaks found three weak tests. `toBeInvalid` was passing because of the native `required` attribute, the refetch wait couldn't fail at zero latency, and one guard was never reached.
+- The `reviewer` found that Cancel looked active during a save that couldn't be stopped, that a too-long description had no page test, that the banner could cover the preview, and that text scrolled through the description label. All are fixed.
+- The fresh code review found that focus was almost invisible on invalid fields and on the checked checkbox, which is where the AC sends it. Both now get an orange outline. It also found that Featured sat 8px too low because it belonged outside the field group.
+- I chose to leave accessibility for one review after the project, so the `a11y-auditor` didn't run. Basics such as labels and linked errors are in place.
+
+**Takeaway:** a guarantee has to be checked at its boundaries. "Save is disabled while saving" sounded complete, but two separate state updates left a gap between them. Looking at the screen also still mattered: green tests couldn't show that an option had reappeared in a list.
+
+Time: 1 hour
