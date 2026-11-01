@@ -146,3 +146,35 @@ Time: 1 hour
 **Takeaway:** tests and the browser caught different problems. Only measuring in the browser showed the skeleton jump, and only asking "what would fail if this were removed?" showed the untestable placeholder and the dead code. Green tests on the first run weren't evidence on their own.
 
 Time: 30 minutes
+
+## 2026-11-01: Slice 3, card menu, delete modal and optimistic delete
+
+**Tools:** Claude Code (Opus), the Playwright MCP, and the `reviewer` and `a11y-auditor` subagents.
+
+**What the agent did:**
+- Read the slice and the Figma frames, then proposed a plan with two deviations for me to approve: a visible orange focus ring on menu items, because the Hover fill is close to invisible on white, and a menu that flips only when it would overflow the viewport.
+- Built the menu, a modal on the native `<dialog>`, and the optimistic delete. The menu is an optional `actions` prop on the card, so the Slice 4 preview needs no change.
+- Wrote the rollback test first and saw it fail, then added component and integration tests. jsdom has no `showModal`, so the test setup has a small stub.
+- Checked in Chromium with the Playwright MCP:
+  - real key presses for the menu and modal, and native focus restore
+  - rollback at real latency, with "Fail deletes" on
+  - menu placement on every card at 5 widths
+  - the modal and the toast at phone and desktop widths
+  - screenshots compared with `menu-open.png` and `delete-modal.png`
+- Broke the code on purpose in 48 ways on a scratch copy to confirm the tests catch each one.
+
+**Review and corrections**
+- The deliberate breaks showed that removing the rollback went unnoticed, because the refetch brought the card back anyway. Hardening the test so only the snapshot could restore the card exposed a real bug: the notice appeared 600–900 ms after the card. Returning the `invalidateQueries` promise from `onSettled` kept the mutation pending until the refetch ended. The notice now appears about 10 ms after the card.
+- The agent had seen an empty notice in the browser and dismissed it as a timing detail. Only the stricter test proved it wrong.
+- The notice first sat next to the Create button. I tried the rollback while scrolled down and couldn't see it, so I asked for a toast fixed to the top right. It stays until dismissed, because a timer could hide the error before it's read.
+- One run failed in a Slice 2 test. A probe found the skeleton could appear before `list` was called (1 in 150 renders), so the test's release did nothing. The helper now creates its promise up front.
+- The browser check found that Demo controls took clicks meant for Delete on the last card on mobile. The menu now sits above it.
+- A native dialog only restores focus while it's attached, so closing it from a React effect cleanup would have lost focus. All paths now close it synchronously.
+- The agent ran a CPU stress test to reproduce the flaky failure. It pushed the load average to about 199 and reproduced nothing. It was stopped and replaced with the probe above.
+- Two `reviewer` runs found test gaps (`preventDefault`, Escape closing the dialog, a press on the trigger, the refetch after a failed delete), a test waiting on a timer, duplicated CSS and dead code. They also found that the open trigger's border was darker than Figma, and that dismissing the toast would have jumped the page to the top. All are fixed.
+- Both subagents found that a second delete during the first can lose the first failure's notice. I accepted this as a known issue (ASSUMPTIONS #47).
+- The `a11y-auditor` found contrast issues in the Figma colours and possible gaps in Windows High Contrast and focus after navigation. I left these for one accessibility review after the project is done.
+
+**Takeaway:** a passing test can hide a bug when another mechanism produces the same result. Deliberately removing code showed that here, and tightening the test found a user-visible delay that the browser check had shown and the agent had explained away. Using the feature also found what checks hadn't: a correct notice is no use if it's off screen.
+
+Time: 1.5 hours

@@ -46,6 +46,7 @@ Extracted from the Figma file (copy `04Q7EHGrcMmgsC4Q6lMeX5`). The raw reference
 **Effects:**
 - Soft shadow: `0 5px 15px rgba(0,0,0,0.10)` (TM/Soft Shadow/Down). Used on card hover and menus.
 - Focus glow: `0 0 4px rgba(236,105,26,0.25)` with a 1px #EC691A border.
+- Modal backdrop: `rgba(34,34,34,0.5)`, no blur. Not in Figma (ASSUMPTIONS #30).
 
 **Component sizes:**
 

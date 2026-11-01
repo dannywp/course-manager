@@ -56,7 +56,7 @@ The service plays the role of the server. Business rules live in it, so no compo
 - [x] "Create a course" button navigates to `/courses/new`. AC: clicking it opens the form route.
 
 ## Slice 3: Card menu, delete modal and optimistic delete [C]
-- [ ] Per-card menu (Edit, Delete) as an accessible menu button:
+- [x] Per-card menu (Edit, Delete) as an accessible menu button:
   - Enter, Space or ArrowDown opens it.
   - Arrow keys move between items.
   - Escape closes it and returns focus to the trigger.
@@ -64,15 +64,15 @@ The service plays the role of the server. Business rules live in it, so no compo
   - Edit links to `/courses/:id/edit`, which is filled in by Slice 5.
 
   AC: the whole flow works with the keyboard only.
-- [ ] Delete confirmation modal showing the course name:
+- [x] Delete confirmation modal showing the course name:
   - focus trapped, initial focus on Cancel
   - Escape and the close button cancel
   - focus returns to the menu trigger, or the next card after deletion
 
   AC: tabbing never leaves the modal.
-- [ ] Optimistic delete: `onMutate` snapshots the list cache and removes the course, `onError` restores the snapshot, `onSettled` invalidates. AC: the card disappears instantly.
-- [ ] Observable rollback: with "fail deletes" on, the card reappears in its original position after the simulated latency, and an `aria-live` error notice names the course. AC: a reviewer can see it disappear and come back.
-- [ ] **Rollback integration test** (React Testing Library with an in-memory service set to fail deletes). It asserts that the card is removed, then restored in the same position, and that the error is shown.
+- [x] Optimistic delete: `onMutate` snapshots the list cache and removes the course, `onError` restores the snapshot, `onSettled` invalidates. AC: the card disappears instantly.
+- [x] Observable rollback: with "fail deletes" on, the card reappears in its original position after the simulated latency, and an `aria-live` error notice names the course. AC: a reviewer can see it disappear and come back.
+- [x] **Rollback integration test** (React Testing Library with an in-memory service set to fail deletes). It asserts that the card is removed, then restored in the same position, and that the error is shown.
 
 ## Slice 4: Create form with live preview [C]
 - [ ] Two-column layout: the form on the left and a sticky preview with a `CARD PREVIEW` label on the right. Below 1024px it stacks, with the preview under the form and not sticky. AC: at 1440px the preview stays in view while the form scrolls.
@@ -149,7 +149,7 @@ The service plays the role of the server. Business rules live in it, so no compo
 **Not in Figma (we design these):**
 - List loading (skeleton), list error with Retry, empty list.
 - Card without an image or with a missing blob, long name or location, card focus-visible, meatball button hover, focus and pressed.
-- Menu keyboard focus: reuse the Hover style. Disabled menu item (unused).
+- Menu keyboard focus: the Hover fill plus the On Click orange border and glow (ASSUMPTIONS #40). Disabled menu item (unused).
 - Modal backdrop, modal on mobile, delete-failure notice (rollback), optional delete-success notice.
 - Editor:
   - create vs edit page title

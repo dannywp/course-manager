@@ -65,3 +65,14 @@ Each entry is written as **Question → Assumption**.
 37. Room for the meatball button. → Figma overlays it on the text block, so a long name would run under it. The location and name lines always reserve 32px on the right. Short names look the same as in Figma, and long ones truncate slightly earlier, with no jump on hover.
 38. A failed refetch with a list already loaded. → The list stays and no error shows, because a background failure shouldn't replace good data. The error state only shows when there is nothing to display, so "Fail list" takes effect on the next reload.
 39. Empty state. → The top "Create a course" button stays in every state, so the empty state shows two of them. Moving a button users rely on would be worse than the repetition.
+
+**Card menu and delete**
+
+40. Menu keyboard focus. → The Hover fill (#FBFBFB) is close to invisible on the white menu, so `:focus-visible` adds the orange border and glow from Figma's "On Click" item state.
+41. Menu direction. → Figma opens the menu rightwards from the trigger, which overflows the viewport in the last column and on mobile. The menu keeps that alignment and flips to right-aligned only when it would overflow.
+42. Tab with the menu open. → Closes the menu and returns focus to the trigger, so focus can't drop to the page.
+43. Focus after a delete. → The next card's menu button, else the previous card's, else the top "Create a course" link.
+44. Clicking the modal backdrop. → Does nothing. Only Escape, the close button and Cancel dismiss the modal.
+45. Delete-failure notice. → "Couldn't delete {name}. It's back in the list." It's a toast fixed to the top right, so it stays in view when the list is scrolled down and the cards don't shift. It clears on dismiss, on the next delete attempt or when leaving the page, and it doesn't time out, so it can't disappear before it's read. Dismissing moves focus to the "Create a course" link without scrolling, so the page stays where the user is. It's a white toast with a red border and normal text colour, because red text at 13px would be below the 4.5:1 contrast minimum.
+46. Pencil, trash and close icons. → Hand-drawn SVGs, because `nodes.json` has no vector geometry.
+47. Overlapping deletes. → Known issue, accepted. The failure notice follows only the latest delete, so if a second delete starts while the first is running, a failure of the first may not be named: its card comes back with no notice, or only the second course is named if both fail. A card can also flicker until the last refetch. The list itself still ends up correct.
