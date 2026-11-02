@@ -1,6 +1,18 @@
+import { useSyncExternalStore } from 'react'
 import styles from './top-nav.module.css'
 
+function subscribeToConnection(onChange: () => void) {
+  window.addEventListener('online', onChange)
+  window.addEventListener('offline', onChange)
+  return () => {
+    window.removeEventListener('online', onChange)
+    window.removeEventListener('offline', onChange)
+  }
+}
+
 export function TopNav() {
+  const online = useSyncExternalStore(subscribeToConnection, () => navigator.onLine)
+
   return (
     <header className={styles.nav}>
       <div className={styles.logo}>
@@ -10,6 +22,9 @@ export function TopNav() {
         </svg>
       </div>
       <span className={styles.product}>Facility portal</span>
+      <span role="status" className={online ? undefined : styles.offline}>
+        {!online && 'Offline'}
+      </span>
     </header>
   )
 }

@@ -1,0 +1,11 @@
+.badge {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding-inline: var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  font: var(--font-trumpet);
+  letter-spacing: var(--letter-spacing-trumpet);
+  text-transform: uppercase;
+}

@@ -30,3 +30,9 @@
   letter-spacing: var(--letter-spacing-nav);
   text-transform: uppercase;
 }
+
+.offline {
+  composes: badge from './badge.module.css';
+
+  margin-inline: auto var(--space-16);
+}

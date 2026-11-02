@@ -105,7 +105,7 @@ describe('before the form shows', () => {
 
     expect(await screen.findByText('Course not found')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to courses' })).toHaveAttribute('href', '/')
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status', { name: 'Loading course' })).not.toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
