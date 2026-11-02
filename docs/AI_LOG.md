@@ -342,3 +342,36 @@ Time: 45 minutes
 **Takeaway:** a summary condensed from a log drifts toward the version that sounds best. Checking each sentence against the code and the log found claims that were close but wrong, such as a custom focus trap described as native.
 
 Time: 30 minutes
+
+## 2026-11-02: Submission review
+
+**Tools:** Claude Code (Opus) and the Playwright MCP.
+
+**What the agent did:**
+- Read a review of the submission, made from a fresh clone of `db99efa`. It found every requirement in the brief working, three things to fix and ten polish items. The agent checked each one against the code and docs before proposing what to do.
+- Removed the "Typical: 68–74" hint under Par at my request, because Figma has none. Par was the only user of the `hint` prop, so the prop, its style and its skeleton line went too.
+- Proposed a plan. I chose:
+  - to fix: the missing 404 route, the PLAN.md Slice 7 wording, the README notes on `npm run preview`, code splitting and `npm audit`, the README's test-first wording, and a red border on drop zone errors
+  - to skip: feedback while Retry runs, the PostCSS build warning, the card height and the demo controls at 320px, and pinning the Node version
+  - to list Tab in the card menu under "What I would improve" instead of changing it
+  - to delete the four merged remote branches
+- Added a catch-all route that shows "Page not found" with a link back to the list. Its test was written first and failed. The edit page's "Course not found" now uses the same component.
+- Checked the `npm audit` numbers and the code-splitting claim before writing them in the README.
+- Checked in Chromium:
+  - the Par hint is gone, and its error still shows and is announced
+  - the 404 page at 1440px and 402px, with no horizontal scroll, and its link back
+  - `/courses/bogus/edit` still shows "Course not found"
+  - the drop zone's red border after a rejected file, with the orange outline and glow on keyboard focus
+
+**Review and corrections**
+- I asked to remove all text under the inputs. The agent pointed out that, without the hint, only validation errors were left, and that Slices 4 and 6 and the brief require them, so it asked first. I had meant only the hint.
+- The review caught things our own checks missed:
+  - the 404 route was in the UI state inventory but in no slice's checkboxes, so no AC covered it
+  - Slice 7's AC claimed "no serious violations", although the axe test turns off the contrast rule
+  - the README didn't say `npm run preview` needs a build first
+- Tab in the card menu returns focus to the menu button (ASSUMPTIONS #42). That was a deliberate choice, but it departs from the WAI-ARIA menu button pattern, which moves focus on to the next element.
+- The `reviewer` subagent didn't run on this round.
+
+**Takeaway:** a UI state listed in the inventory but not in any slice's checkboxes was never built. Every state in the inventory needs an AC, or it gets lost.
+
+Time: 15 minutes

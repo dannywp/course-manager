@@ -19,7 +19,7 @@ Each entry is written as **Question → Assumption**.
 
 **Validation**
 
-12. Par range. → Integer from 54 to 80. The hint says "Typical: 68–74".
+12. Par range. → Integer from 54 to 80. There is no hint under the field, as in Figma.
 13. Name rules. → Trimmed, 1–80 characters.
 14. Is an image required? → No. The placeholder is used instead.
 15. Image size limit. → 5 MB. When several files are dropped, use the first and ignore the rest.
@@ -85,7 +85,7 @@ Each entry is written as **Question → Assumption**.
 51. Validation errors. → A red border with the message in normal text colour, because red text at 11px on the grey page is below the 4.5:1 contrast minimum.
 52. Save failure. → "Couldn't save the course. Your changes are still here." A banner at the top of the form column that sticks to the top of the viewport, so it stays in view if Enter submits while scrolled down and can't cover the preview.
 53. Text field focus. → The orange border and glow of Figma's focused select, and the label floats on focus so it doesn't overlap typing.
-54. Par input. → A text input with a numeric keyboard, so there are no spinners and scrolling can't change the value. The "Typical: 68–74" hint sits under the field, so Featured sits about 20px lower than in Figma.
+54. Par input. → A text input with a numeric keyboard, so there are no spinners and scrolling can't change the value.
 55. Fields while saving. → They stay editable, and only Save and Cancel are disabled. Disabling a focused field drops keyboard focus to the page when a save fails. Cancel can't stop a save that has started, so it's disabled rather than left to imply it can. A save also finishes if the user leaves with the browser's Back button, and it then returns them to the list.
 
 **Edit course**
@@ -113,3 +113,4 @@ Each entry is written as **Question → Assumption**.
 70. Offline indicator. → Not in Figma. An "Offline" badge at the right of the top nav, styled like the FEATURED badge, shows while the browser reports no connection. Screen readers announce it. The app keeps working offline, because courses and images are stored in the browser.
 71. What works offline. → The service worker caches the whole built app: every route, the Latin Inter fonts, the seed images and the placeholder. So the forms open offline too, not only the list. There is no web app manifest, because the brief asks for offline use, not installing. The service worker only runs in production builds (`npm run build && npm run preview`), so `npm run dev` and the e2e tests are never served from the cache.
 72. A new version while the app is open. → Once the new service worker has installed, which is a few seconds after the app opens, the open tab reloads. Otherwise the old page would ask for old route files that the new cache and the server no longer have. Anything typed into a form in those seconds is lost.
+73. Unknown URLs. → Not in Figma. A "Page not found" page inside the app shell, with the top nav, the demo controls and a "Back to courses" link, styled like the edit page's "Course not found" (#58). `/courses` and `/courses/{id}` without `/edit` show it too.

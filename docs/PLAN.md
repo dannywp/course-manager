@@ -118,7 +118,7 @@ The service plays the role of the server. Business rules live in it, so no compo
 ## Slice 7: Polish [N]
 - [x] [N] Playwright end-to-end test: create a featured course with an image, see it ordered correctly, reload, see the image, delete it.
 - [x] [N] Basic PWA: service worker caches the list page, plus an offline indicator. AC: in DevTools offline mode, a reload shows the list and an "Offline" badge.
-- [x] [N] Extra accessibility: visible focus rings using the orange focus glow, reduced-motion respect, an axe check with no serious violations.
+- [x] [N] Extra accessibility: visible focus rings using the orange focus glow, reduced-motion respect, an axe check with no serious violations apart from `color-contrast` (ASSUMPTIONS #69).
 
 ## Slice 8: Deliverables [C]
 - [x] README covering setup, assumptions (linking ASSUMPTIONS.md and DECISIONS.md), tradeoffs, improvements with more time, and the AI usage note. AC: every heading the brief asks for is present.

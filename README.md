@@ -19,6 +19,7 @@ Things to try in the running app, after [Setup](#setup). Every service call take
 - **Error states:** with **Fail list** on, reload the page or open an edit page to see the error with Retry. With **Fail saves** on, Save shows a banner and keeps the form filled.
 - **Images:** create a course with an image, save and reload. The image is still on the card and in the edit form.
 - **Offline:** run `npm run build && npm run preview` and open http://localhost:4173. Load the list once, switch DevTools to offline and reload. The list still shows, with an "Offline" badge.
+- **Code splitting:** run `npm run dev` and open the Network panel. The create and edit pages' route files load only when you open those pages. `npm run preview` doesn't show this, because its service worker downloads every route file after the first load, for offline use.
 
 ## Setup
 
@@ -30,11 +31,13 @@ npx playwright install chromium   # only needed for npm run test:e2e
 npm run dev
 ```
 
+`npm install` reports 21 vulnerabilities and that ESLint 9 is no longer supported. All of them are in dev tooling (ESLint and the service worker build), and `npm audit --omit=dev` finds none.
+
 | Command | What it does |
 |---|---|
 | `npm run dev` | Dev server at http://localhost:5173 |
 | `npm run build` | Typecheck and production build |
-| `npm run preview` | Serve the production build, with offline support, at http://localhost:4173 |
+| `npm run preview` | Serve the production build (run `npm run build` first), with offline support, at http://localhost:4173 |
 | `npm run typecheck` | TypeScript (strict) |
 | `npm run lint` | ESLint |
 | `npm test` | Unit and component tests (Vitest) |
@@ -76,7 +79,7 @@ Smaller ones (the numbers are [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md) entries
 
 190 Vitest tests and 6 Playwright tests. They cover the rules and failure paths that are easy to get subtly wrong and hard to see in the UI:
 
-- **Featured ordering and timestamps** (`src/services/course-rules.test.ts`, written before the code): the brief's feat1–feat4 example, every featured transition, and ties.
+- **Featured ordering and timestamps** (`src/services/course-rules.test.ts`, written first and committed with the code): the brief's feat1–feat4 example, every featured transition, and ties.
 - **Optimistic delete** (`src/routes/courses-page.test.tsx`): with deletes failing, the card is removed, comes back in its position from the snapshot rather than from the refetch, and the notice names the course.
 - **The form** (`src/routes/create-course-page.test.tsx`, `src/routes/edit-course-page.test.tsx`): an error per required field with focus on the first, one course from a double click, values kept after a failed save, and edits kept when a background refresh fails.
 - **The service** (`src/services/local-courses-service.test.ts`): data survives a new service instance, as after a refresh, and replacing or deleting an image leaves no orphaned blobs.
@@ -92,6 +95,7 @@ To check that the tests can fail, the agent broke the code on purpose on a scrat
   - screen-reader text for the loading skeleton
   - Windows High Contrast
   - a delete failure that arrives while the modal is open
+  - Tab in an open card menu: it returns focus to the menu button (#42), where the WAI-ARIA menu button pattern moves on to the next element
 - **Overlapping deletes:** when a second delete starts while the first is running, a failure of the first may not be named (#47). The list still ends up correct, but every failed course should be named.
 - **Missing features:** "Reset demo data", an unsaved-changes guard (#24) and removing an image (#67).
 - **Demo controls:** a collapsed panel hides active switches, a corrupted switch value crashes the app, and corrupted course data can't be recovered from the UI.
