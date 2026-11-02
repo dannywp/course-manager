@@ -86,6 +86,7 @@ export function ImageField({ image, onSelect }: ImageFieldProps) {
           type="button"
           className={styles.dropZone}
           data-dragging={dragging || undefined}
+          data-invalid={error !== null || undefined}
           aria-describedby={error ? errorId : undefined}
           onClick={() => inputRef.current!.click()}
           onDragEnter={(event) => event.preventDefault()}

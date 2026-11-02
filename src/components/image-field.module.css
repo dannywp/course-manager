@@ -29,6 +29,15 @@
   background: var(--color-lighter-gray);
 }
 
+.dropZone[data-invalid] {
+  border-color: var(--color-danger);
+}
+
+.dropZone[data-invalid]:focus-visible {
+  outline: var(--space-1) solid var(--color-orange);
+  outline-offset: var(--space-1);
+}
+
 .title {
   font: var(--font-body-bold);
 }
