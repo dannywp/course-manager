@@ -93,4 +93,16 @@ Each entry is written as **Question → Assumption**.
 56. Edit loading state. → A skeleton built from the form's own layout and the card skeleton, so the page doesn't move when the course arrives. The action bar is empty until then.
 57. Opening the edit page. → It always loads the course fresh, so the loading state shows on every visit. The form reads its values once when it mounts, so a cached copy could prefill it with old data and overwrite newer values.
 58. Edit not-found and error states. → "Course not found" with a "Back to courses" link, and "Couldn't load the course" with Retry, as on the list.
-59. A course's image while editing. → The preview shows it and saving keeps it. Changing it arrives in Slice 6.
+59. A course's image while editing. → The file row and the preview show it, and saving keeps it unless a new file is chosen.
+
+**Images**
+
+60. Image size message. → "Keep the image to 5 MB or less", in the style of the other validation messages.
+61. When an image is stored. → On Save, together with the course. Choosing a file only previews it, so Cancel or a failed save leaves nothing in IndexedDB.
+62. The file name on the edit page. → IndexedDB stores the uploaded file itself, so its name survives and the file row shows it. Seed images show their static file name, such as "pebble-beach.jpg". Course records still store only the `imageId`.
+63. Drop zone. → A button: click, Enter or Space opens the file picker, and dropping a file selects it. Drag-over and keyboard focus show the orange border and glow, and drag-over also lightens the fill. Hover darkens the border, as on the inputs.
+64. After choosing a file. → The file row replaces the drop zone, and focus moves to its pen button so it doesn't drop to the page. The file row doesn't take drops; the pen button opens the picker. A file dropped anywhere on the form outside the drop zone is ignored, because the browser would otherwise open it and the form would be lost.
+65. Rejected files. → The message shows under the drop zone or file row and is announced, and the previous image stays. The service also rejects them, as a server would.
+66. Drop-zone contrast. → The Figma colours are kept, although #7B7B7B text on #E0E0E0 is 3.2:1, below the 4.5:1 minimum. It's left for the accessibility review after the project.
+67. Removing an image. → Out of scope. An image can be replaced but not removed, because neither the brief nor Figma has a control for it.
+68. Edit loading skeleton. → It has the file row's shape, because most courses have an image. For a course without one, the page grows by the drop zone's extra height when the course arrives.

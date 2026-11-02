@@ -99,21 +99,21 @@ The service plays the role of the server. Business rules live in it, so no compo
 - [x] After update, invalidate the list and the course's detail query, then return to the list. AC: the edited values show, and reopening the edit page shows the new values.
 
 ## Slice 6: Image handling with IndexedDB persistence [C]
-- [ ] Image blobs are stored in IndexedDB with `idb-keyval`, keyed by `imageId`. Course records store only the `imageId`. AC: after a refresh, uploaded images still render on cards and in the edit form.
-- [ ] The service resolves each course's image to a URL:
+- [x] Image blobs are stored in IndexedDB with `idb-keyval`, keyed by `imageId`. Course records store only the `imageId`. AC: after a refresh, uploaded images still render on cards and in the edit form.
+- [x] The service resolves each course's image to a URL:
   - an object URL for a stored blob, cached per `imageId` and revoked when the image is replaced or deleted
   - a static path in `/public/seed` for seed images, which are never stored in IndexedDB
   - `null` when the blob is missing, so the UI shows the placeholder
 
   AC: deleting the IndexedDB entry by hand and reloading shows the placeholder, with no broken image.
-- [ ] Deleting a course also deletes its blob. Replacing an image deletes the old blob. AC: IndexedDB holds no orphaned blobs after these operations.
-- [ ] Drop zone: drag and drop, or click / Enter / Space to open the file picker. AC: both paths select a file.
-- [ ] Accept only jpg, png and webp, checked by MIME type and extension. Reject anything else with an inline message. AC: dropping a `.gif` or `.pdf` shows "Only JPG, PNG or WebP images are allowed" and keeps the previous image.
-- [ ] Max size 5 MB. When several files are dropped, use the first. AC: a larger file shows a size error.
-- [ ] Drag-over highlight state. AC: dragging a file over the zone changes its style.
-- [ ] After upload the drop zone becomes a file row with thumbnail, filename and pen button. The pen reopens the file picker. AC: the filename shows, and the pen opens the picker.
-- [ ] Before upload, the preview shows the placeholder. After upload it shows the selected image immediately. AC: the image shows in the preview before save and on the card after save.
-- [ ] [N] Unit test for the file-type and size validation.
+- [x] Deleting a course also deletes its blob. Replacing an image deletes the old blob. AC: IndexedDB holds no orphaned blobs after these operations.
+- [x] Drop zone: drag and drop, or click / Enter / Space to open the file picker. AC: both paths select a file.
+- [x] Accept only jpg, png and webp, checked by MIME type and extension. Reject anything else with an inline message. AC: dropping a `.gif` or `.pdf` shows "Only JPG, PNG or WebP images are allowed" and keeps the previous image.
+- [x] Max size 5 MB. When several files are dropped, use the first. AC: a larger file shows a size error.
+- [x] Drag-over highlight state. AC: dragging a file over the zone changes its style.
+- [x] After upload the drop zone becomes a file row with thumbnail, filename and pen button. The pen reopens the file picker. AC: the filename shows, and the pen opens the picker.
+- [x] Before upload, the preview shows the placeholder. After upload it shows the selected image immediately. AC: the image shows in the preview before save and on the card after save.
+- [x] [N] Unit test for the file-type and size validation.
 
 ## Slice 7: Polish [N]
 - [ ] [N] Playwright end-to-end test: create a featured course with an image, see it ordered correctly, reload, see the image, delete it.

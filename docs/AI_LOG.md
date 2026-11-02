@@ -236,3 +236,42 @@ Time: 1 hour
 **Takeaway:** an order that looks arbitrary in code (checking for data before checking for an error) can be what protects the user's work. Only a test that sets up the failure keeps it from being "tidied" back.
 
 Time: 30 minutes
+
+## 2026-11-02: Slice 6, image handling with IndexedDB
+
+**Tools:** Claude Code (Opus), the Playwright MCP, the `reviewer` subagent and a second code-review subagent.
+
+**What the agent did:**
+- Proposed a plan with three questions for me. I chose:
+  - to store the uploaded file itself in IndexedDB, so the edit page can show its name
+  - to keep Figma's drop-zone colours, although the text is below the contrast minimum (deferred to the accessibility review)
+  - to give the service a replaceable image store for tests, instead of adding a fake IndexedDB package
+- Wrote the validation and service tests first.
+- The service stores an image together with its course on Save. It resolves each image to one cached object URL, revokes it when the image is replaced or deleted, and falls back to the placeholder when the stored file is missing.
+- Built the drop zone and the file row. Focus moves to the pen button when the row replaces the zone.
+- Broke the code on purpose 18 times. The tests missed one: a guard against deleting seed images, which turned out to protect nothing and was removed.
+- Checked in Chromium at real latency:
+  - click, Enter and Space open the picker
+  - rejected files keep the previous image
+  - images survive a reload
+  - IndexedDB has no leftover images after replace and delete
+  - deleting a stored image by hand shows the placeholder
+  - the skeleton matches the page height at four widths
+
+**Review and corrections**
+- Both reviewers found that a real file dropped next to the drop zone opens in the tab and throws away the form. The browser check couldn't show this, because scripted drops skip the browser's own handling. I chose to ignore drops outside the zone, rather than make the file row accept drops.
+- The `reviewer` found that the service trusted the form's image id on update, so two open tabs could delete the image that had just been saved. Update now keeps the stored image unless a new file is sent.
+- The code review found:
+  - no test for releasing the preview URLs, and one duplicate test
+  - an image left behind when saving the record fails
+  - a save reported as failed when only the old image's delete failed
+  - no placeholder for a thumbnail that can't load (it now shares the card's fallback)
+  - a 16px gap where Figma has 32px
+  - two unrelated lockfile changes
+
+  All are fixed.
+- The `a11y-auditor` didn't run, as I decided in Slice 3. The drop zone's screen-reader name is left for the accessibility review.
+
+**Takeaway:** scripted browser events prove the app's own handlers, but skip what the browser does by default. The drop that loses the form was only found by reading the code.
+
+Time: about 1 hour
