@@ -106,38 +106,19 @@ To check that the tests can fail, the agent broke the code on purpose on a scrat
 
 The full log, slice by slice, is in [docs/AI_LOG.md](docs/AI_LOG.md). The logged sessions add up to about 10 hours of total running time, including agent runs, reviews and checks.
 
-### Tools
+**Tools**
+- Claude Code with Opus for everything: planning, code, tests and reviews. The subagents use the same model.
+- The Figma MCP server until it hit the Starter-plan call limit, then the Figma REST API, with a snapshot saved in [docs/figma/](docs/figma/README.md).
+- The Playwright MCP server for browser checks, and a separate Claude chat session as an independent reviewer of the plan, CLAUDE.md and some of the agent's fixes.
 
-- Claude Code (Opus) in VS Code, with plan mode for the planning.
-- The Figma MCP server. It hit the Starter-plan call limit during planning, so the agent switched to the Figma REST API with a personal token and saved a snapshot in [docs/figma/](docs/figma/README.md).
-- The Playwright MCP server for browser checks.
-- A separate Claude chat session as an independent reviewer of the plan, the harness and some of the agent's fixes.
-- A personal `requesting-code-review` skill for a second code review on some slices.
+**How I set them up**
+- [CLAUDE.md](CLAUDE.md) is a short router to the plan, decisions, assumptions, design tokens and Figma snapshot. Hooks run typecheck and lint after every code edit, and block the agent's commits when the subject isn't a Conventional Commit.
+- Subagents: `reviewer` and `a11y-auditor`, which have no edit tools, and `test-writer`. Commands: `/slice <n>`, which stops for my approval of the plan and of the commit, and `/review`, which runs the reviewer on the uncommitted diff.
+- Every slice started with a plan I approved before any code. Before submitting, a clean clone went through install, build, unit and e2e tests.
 
-### How they were harnessed
+**What it helped with most:** extracting design data from Figma, listing every UI state, and breaking the code on purpose to find tests that passed without protecting anything.
 
-- **Instructions:** [CLAUDE.md](CLAUDE.md) is a short router to the plan, decisions, assumptions and design tokens. It states the architecture rules (data only through the service, business rules only in the service) and a definition of done per slice.
-- **Hooks** ([.claude/settings.json](.claude/settings.json)): typecheck and lint run after every code edit, and a hook on the agent's `git commit` blocks subjects that aren't Conventional Commits.
-- **Subagents** ([.claude/agents/](.claude/agents/)): `reviewer` and `a11y-auditor` have no edit tools, and their instructions limit Bash to read-only commands. The `a11y-auditor` ran in Slice 3; after that I moved accessibility work to one review after the project. `test-writer` writes behaviour tests.
-- **Slash commands** ([.claude/commands/](.claude/commands/)): `/slice <n>` runs one slice and stops for my approval of the plan, then of the AI_LOG entry and the commit. `/review` runs the reviewer on the uncommitted diff.
-- **Planning:** the work was split into slices with acceptance criteria before any code.
-- **Skills and MCP servers:** listed under Tools. Once the Figma MCP limit was hit, CLAUDE.md and `/slice` forbid calling it, so the agent works from the local snapshot.
-- **Parallel runs:** none. Slices ran one at a time, because each builds on the last.
-
-### What they were used for and where they helped most
-
-- Extracting design data from Figma: tokens, frame measurements, images and the logo.
-- Listing every UI state, including the ones Figma doesn't show.
-- Scaffolding and writing the code, with tests first for the business rules, the rollback and the image service.
-- Checking in a real browser at many widths, and measuring layouts against the Figma screenshots.
-- Breaking the code on purpose to find weak tests.
-
-It helped most in review. The reviewer subagents, the deliberate breaks and stricter tests found bugs that a quick check missed or explained away: a rollback notice that appeared 600–900 ms late, a double click that could create two courses, a file dropped next to the drop zone that threw away the form, and a service worker update that broke open tabs.
-
-### How output was reviewed, validated and adjusted
-
-- I approved each slice's plan before any code. In Slice 1 the agent dropped part of an approved plan and only told me afterwards.
-- I verified changes with `git diff`, not the agent's summary. During planning it twice reported changes to files that weren't changed.
-- The agent checked UI in the browser against the Figma screenshots, and I tried the features myself. Some problems no test could see: a skeleton 10px shorter than the card, and a delete-failure notice off screen when the list was scrolled.
-- I reversed or rejected agent choices when the reasoning was wrong. For example, it changed correct `<header>` markup to get past a jsdom quirk, and it proposed hiding the "Create a course" button in the empty state.
-- Each AI_LOG entry says what review caught and what I corrected.
+**How I reviewed and corrected it.** Three examples; the full log is in [docs/AI_LOG.md](docs/AI_LOG.md).
+- The independent review found that the plan's breakpoints (1024px and 1280px) didn't fit the card minimum, gap and padding the agent had extracted itself. I recomputed them as 1056px and 1392px (D1).
+- When jsdom reported two banner landmarks, the agent changed a correct `<header>` to a `<div>` to make the test pass. I reverted it and changed the test instead.
+- The agent twice reported changes to files that weren't changed. I now check `git diff` instead of its summary, and CLAUDE.md requires diff output for every claimed change.
