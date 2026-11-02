@@ -37,7 +37,7 @@ Each entry is written as **Question → Assumption**.
 18. "Newest first" for non-featured courses. → Sort by `createdAt` descending, so editing doesn't reorder. The service returns the list sorted.
 19. Failure simulation. → A visible demo-control toggle with "fail list", "fail saves" and "fail deletes", persisted per browser and shipped in production builds. It is deterministic, not random.
 20. Latency. → A random 600–900 ms per call. Tests set it to zero.
-21. Seed data. → Seed 6 courses on first run, with images exported from Figma as static files, plus a "Reset demo data" action. An empty list is still reachable by deleting all courses.
+21. Seed data. → Seed 6 courses on first run, with images exported from Figma as static files. A "Reset demo data" action was planned but never given a slice, so it wasn't built. An empty list is reachable by deleting all courses.
 22. Image persistence. → Images persist in IndexedDB as core (DECISIONS.md D2). A missing blob falls back to the placeholder.
 23. Post-save feedback. → Navigate to the list without a toast, because Figma has none. Errors show inline.
 24. Unsaved-changes guard when leaving the form. → Out of scope.

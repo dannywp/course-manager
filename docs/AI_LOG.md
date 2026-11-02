@@ -306,3 +306,39 @@ Time: about 1 hour
 **Takeaway:** a global style reaches elements a manual check doesn't visit, and offline caching has to be tested across a deploy, not only on the first load. Offline worked on the first try. Only a second build showed the broken update.
 
 Time: 45 minutes
+
+## 2026-11-02: Slice 8, deliverables
+
+**Tools:** Claude Code (Opus) in plan mode, the Playwright MCP, the `reviewer` subagent and the `requesting-code-review` skill.
+
+**What the agent did:**
+- Read the brief's README requirements, this log, the decisions, the assumptions and the harness files, then proposed a plan with four questions for me. I chose:
+  - to add a "What is tested and why" section, a reviewer walkthrough and the total running time
+  - to describe parallel runs as none, one slice at a time
+  - to correct ASSUMPTIONS #21, which still listed a "Reset demo data" action that was never built
+  - no deploy link, since the app runs locally
+- Rewrote the README: setup, assumptions, tradeoffs, tests, improvements, and the AI usage note with the brief's four points, condensed from this log.
+- Checked the README against the repo:
+  - every heading the brief asks for, and every relative link
+  - each command, port, test file and ASSUMPTIONS reference
+  - test counts from real runs: 190 Vitest and 6 Playwright tests
+  - a clean clone through install, build, unit and e2e tests
+  - each walkthrough step in Chromium against the production build, offline included
+
+**Review and corrections**
+- The `reviewer` found 15 issues. Among them, the README claimed:
+  - that the browser provided the modal's focus trap, which is custom Tab handling
+  - that the subagents were read-only, although only their instructions keep Bash read-only
+  - that all three subagents were in use throughout, although the `a11y-auditor` ran only in Slice 3
+  - that "Reset demo data" was cut from the cut list, which is cut from the top while items 1–3 shipped
+
+  It also found repeated text, headings that didn't follow the brief's wording, and no documented way back to the seed data. All are fixed.
+- It found that the reload on a new version can also hit a tab that has been open for a while, not only in its first seconds (#72). I left it as is.
+- The second code review found that the README put the accessibility review "at the end of the project" while listing it as not done, plus claims a little stronger than this log. One example: the late rollback notice was described as invisible to a quick check, although the browser check had shown it. All are fixed.
+- I approved changing D4, which said reviewers "will use the deployed build", although there is no deployment.
+- I asked for the total time to be worded as running time, since the 10 hours include agent runs and reviews, not only my own work.
+- The `a11y-auditor` didn't run, because the slice changes no UI.
+
+**Takeaway:** a summary condensed from a log drifts toward the version that sounds best. Checking each sentence against the code and the log found claims that were close but wrong, such as a custom focus trap described as native.
+
+Time: 30 minutes

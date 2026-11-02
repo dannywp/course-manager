@@ -121,8 +121,8 @@ The service plays the role of the server. Business rules live in it, so no compo
 - [x] [N] Extra accessibility: visible focus rings using the orange focus glow, reduced-motion respect, an axe check with no serious violations.
 
 ## Slice 8: Deliverables [C]
-- [ ] README covering setup, assumptions (linking ASSUMPTIONS.md and DECISIONS.md), tradeoffs, improvements with more time, and the AI usage note. AC: every heading the brief asks for is present.
-- [ ] `docs/AI_LOG.md` kept up to date during the work.
+- [x] README covering setup, assumptions (linking ASSUMPTIONS.md and DECISIONS.md), tradeoffs, improvements with more time, and the AI usage note. AC: every heading the brief asks for is present.
+- [x] `docs/AI_LOG.md` kept up to date during the work.
 
 ## UI state inventory
 

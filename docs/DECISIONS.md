@@ -60,7 +60,7 @@ Tracks are `minmax(min(304px, 100%), 380px)` and centered. 380px is the card max
 
 ## D4. Failure simulation is deterministic and per operation
 
-**Decision.** A visible toggle with three switches, persisted per browser. It is clearly labelled as a demo control and ships in production builds, not gated behind `import.meta.env.DEV`, because reviewers will use the deployed build. The switches:
+**Decision.** A visible toggle with three switches, persisted per browser. It is clearly labelled as a demo control and ships in production builds, not gated behind `import.meta.env.DEV`, because reviewers may use the production build (`npm run build && npm run preview`). The switches:
 - **fail list:** `list` and `get` reject. This shows the list and edit error states with Retry.
 - **fail saves:** `create` and `update` reject. This shows the save error banner with the form values kept.
 - **fail deletes:** `remove` rejects. This shows the optimistic removal followed by the rollback.
