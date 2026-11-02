@@ -63,13 +63,3 @@
   padding: 0;
   list-style: none;
 }
-
-.message {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-16);
-  padding-block: var(--space-40);
-  text-align: center;
-}

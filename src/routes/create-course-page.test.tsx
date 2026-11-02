@@ -2,14 +2,12 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { coursesService } from '../services/courses-service'
 import { writeFailureSwitch } from '../services/failure-switches'
+import { createGate } from '../test/create-gate'
+import { field, listHeading, preview, type } from '../test/form-queries'
 import { renderApp } from '../test/render-app'
 
-const field = (label: string) => screen.getByLabelText(label)
-const type = (label: string, value: string) => fireEvent.change(field(label), { target: { value } })
 const saveButton = () => screen.getByRole('button', { name: 'Save' })
-const preview = () => within(screen.getByRole('complementary', { name: 'Card preview' }))
 const openForm = () => screen.findByRole('heading', { level: 1, name: 'Create course' })
-const listHeading = () => screen.findByRole('heading', { level: 1, name: 'Courses' })
 
 function fillValidCourse() {
   type('Title*', '  Adare Manor ')
@@ -22,14 +20,6 @@ function fillValidCourse() {
 async function renderForm() {
   renderApp('/courses/new')
   await openForm()
-}
-
-function createGate() {
-  let open = () => {}
-  const passed = new Promise<void>((resolve) => {
-    open = resolve
-  })
-  return { open, passed }
 }
 
 function holdNextCreate() {

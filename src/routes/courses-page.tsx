@@ -7,6 +7,7 @@ import { CourseCardSkeleton } from '../components/course-card-skeleton'
 import { CourseMenu } from '../components/course-menu'
 import { DeleteCourseModal } from '../components/delete-course-modal'
 import { PageHeader } from '../components/page-header'
+import messageStyles from '../components/page-message.module.css'
 import type { CourseWithImage } from '../domain/course'
 import { useCoursesQuery } from '../hooks/use-courses-query'
 import { useDeleteCourseMutation } from '../hooks/use-delete-course-mutation'
@@ -24,7 +25,7 @@ function CoursesState({ onDelete }: { onDelete: (request: DeleteRequest) => void
 
   if (courses?.length === 0) {
     return (
-      <div className={styles.message}>
+      <div className={messageStyles.message}>
         <p>No courses yet</p>
         <Link to="/courses/new" className={buttonClass}>
           Create a course
@@ -50,7 +51,7 @@ function CoursesState({ onDelete }: { onDelete: (request: DeleteRequest) => void
 
   if (isError) {
     return (
-      <div className={styles.message} role="alert">
+      <div className={messageStyles.message} role="alert">
         <p>Couldn't load the courses</p>
         <button type="button" className={buttonClass} onClick={() => void refetch()}>
           Retry

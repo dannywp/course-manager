@@ -88,6 +88,19 @@ export function SelectField({
   )
 }
 
+export function FieldSkeleton({ tall = false, withHint = false, className = '' }: { tall?: boolean; withHint?: boolean; className?: string }) {
+  return (
+    <div className={`${styles.field} ${className}`}>
+      <div className={`${styles.controlSkeleton} ${tall ? styles.tall : ''}`} />
+      {withHint && <p className={styles.hint}>&nbsp;</p>}
+    </div>
+  )
+}
+
+export function CheckboxSkeleton() {
+  return <div className={styles.checkboxSkeleton} />
+}
+
 export function CheckboxField({ label, ...input }: Pick<FieldProps, 'label'> & Omit<ComponentProps<'input'>, 'className'>) {
   return (
     <label className={styles.checkboxField}>

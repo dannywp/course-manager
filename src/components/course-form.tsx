@@ -1,21 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useId } from 'react'
+import { useId, type ReactNode } from 'react'
 import { useForm, useWatch, type Control } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { countries } from '../domain/countries'
-import { courseInputSchema, type CourseInput } from '../domain/course'
+import { courseInputSchema, type CourseInput, type CourseWithImage } from '../domain/course'
 import buttonStyles from './button.module.css'
 import { CourseCard } from './course-card'
+import { CourseCardSkeleton } from './course-card-skeleton'
 import styles from './course-form.module.css'
-import { CheckboxField, SelectField, TextAreaField, TextField } from './form-fields'
+import { CheckboxField, CheckboxSkeleton, FieldSkeleton, SelectField, TextAreaField, TextField } from './form-fields'
 
 type CourseFormProps = {
+  course?: CourseWithImage
   saveFailed: boolean
   onSubmit: (input: CourseInput) => Promise<void>
 }
 
-function CoursePreview({ control }: { control: Control<CourseInput> }) {
-  const { name, city, countryCode, par, difficulty, featured } = useWatch({ control })
+const detailsHeading = (
+  <div>
+    <h2 className={styles.heading}>Course details</h2>
+    <p className={styles.explainer}>Review the information and make changes if necessary.</p>
+  </div>
+)
+
+const locationHeading = <h2 className={styles.heading}>Location</h2>
+
+function PreviewPanel({ children }: { children: ReactNode }) {
   const labelId = useId()
 
   return (
@@ -23,6 +33,16 @@ function CoursePreview({ control }: { control: Control<CourseInput> }) {
       <p id={labelId} className={styles.previewLabel}>
         Card preview
       </p>
+      {children}
+    </aside>
+  )
+}
+
+function CoursePreview({ control, imageUrl }: { control: Control<CourseInput>; imageUrl: string | null }) {
+  const { name, city, countryCode, par, difficulty, featured } = useWatch({ control })
+
+  return (
+    <PreviewPanel>
       <CourseCard
         course={{
           name,
@@ -31,14 +51,46 @@ function CoursePreview({ control }: { control: Control<CourseInput> }) {
           par: Number.isInteger(par) ? par : undefined,
           difficulty: Number.isInteger(difficulty) ? difficulty : undefined,
           featured: featured === true,
-          imageUrl: null,
+          imageUrl,
         }}
       />
-    </aside>
+    </PreviewPanel>
   )
 }
 
-export function CourseForm({ saveFailed, onSubmit }: CourseFormProps) {
+export function CourseFormSkeleton() {
+  return (
+    <div role="status" aria-label="Loading course">
+      <div className={styles.actions} />
+      <div className={styles.columns}>
+        <div>
+          <section className={styles.section}>
+            {detailsHeading}
+            <div className={styles.fields}>
+              <FieldSkeleton />
+              <FieldSkeleton />
+              <FieldSkeleton tall className={styles.wide} />
+              <FieldSkeleton withHint />
+            </div>
+            <CheckboxSkeleton />
+          </section>
+          <section className={styles.section}>
+            {locationHeading}
+            <div className={styles.fields}>
+              <FieldSkeleton />
+              <FieldSkeleton />
+            </div>
+          </section>
+        </div>
+        <PreviewPanel>
+          <CourseCardSkeleton />
+        </PreviewPanel>
+      </div>
+    </div>
+  )
+}
+
+export function CourseForm({ course, saveFailed, onSubmit }: CourseFormProps) {
   const navigate = useNavigate()
   const {
     control,
@@ -47,7 +99,7 @@ export function CourseForm({ saveFailed, onSubmit }: CourseFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<CourseInput>({
     resolver: zodResolver(courseInputSchema),
-    defaultValues: { name: '', city: '', featured: false, description: '', imageId: null },
+    defaultValues: course ?? { name: '', city: '', featured: false, description: '', imageId: null },
   })
 
   return (
@@ -73,10 +125,7 @@ export function CourseForm({ saveFailed, onSubmit }: CourseFormProps) {
             </p>
           )}
           <section className={styles.section}>
-            <div>
-              <h2 className={styles.heading}>Course details</h2>
-              <p className={styles.explainer}>Review the information and make changes if necessary.</p>
-            </div>
+            {detailsHeading}
             <div className={styles.fields}>
               <TextField label="Title*" required error={errors.name?.message} {...register('name')} />
               <SelectField
@@ -109,7 +158,7 @@ export function CourseForm({ saveFailed, onSubmit }: CourseFormProps) {
             <CheckboxField label="Featured course" {...register('featured')} />
           </section>
           <section className={styles.section}>
-            <h2 className={styles.heading}>Location</h2>
+            {locationHeading}
             <div className={styles.fields}>
               <TextField label="City/State*" required error={errors.city?.message} {...register('city')} />
               <SelectField label="Country*" required error={errors.countryCode?.message} {...register('countryCode')}>
@@ -122,7 +171,7 @@ export function CourseForm({ saveFailed, onSubmit }: CourseFormProps) {
             </div>
           </section>
         </div>
-        <CoursePreview control={control} />
+        <CoursePreview control={control} imageUrl={course?.imageUrl ?? null} />
       </div>
     </form>
   )

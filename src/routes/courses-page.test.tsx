@@ -4,6 +4,7 @@ import type { CourseWithImage } from '../domain/course'
 import { coursesQueryKey } from '../hooks/use-courses-query'
 import { coursesService } from '../services/courses-service'
 import { writeFailureSwitch } from '../services/failure-switches'
+import { createGate } from '../test/create-gate'
 import { renderApp } from '../test/render-app'
 
 const cardNames = async () => (await screen.findAllByRole('heading', { level: 2 })).map((name) => name.textContent)
@@ -19,15 +20,12 @@ function holdNextList() {
 
 function holdNextRemove() {
   const { remove } = coursesService
-  let release = () => {}
-  const gate = new Promise<void>((resolve) => {
-    release = resolve
-  })
+  const gate = createGate()
   vi.spyOn(coursesService, 'remove').mockImplementationOnce(async (id) => {
-    await gate
+    await gate.passed
     return remove(id)
   })
-  return release
+  return gate.open
 }
 
 async function openDeleteModal(name: string) {
