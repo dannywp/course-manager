@@ -32,4 +32,4 @@ export const courseSchema = courseInputSchema
 
 export type CourseInput = z.infer<typeof courseInputSchema>
 export type Course = z.infer<typeof courseSchema>
-export type CourseWithImage = Course & { imageUrl: string | null }
+export type CourseWithImage = Course & { imageUrl: string | null; imageName: string | null }

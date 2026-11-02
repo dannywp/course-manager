@@ -8,15 +8,16 @@ export function useSaveCourse(id?: string) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { mutateAsync, isError } = useMutation({
-    mutationFn: (input: CourseInput) => (id ? coursesService.update(id, input) : coursesService.create(input)),
+    mutationFn: ({ input, image }: { input: CourseInput; image?: File }) =>
+      id ? coursesService.update(id, input, image) : coursesService.create(input, image),
     // The key also matches the course's detail query. The list isn't mounted during a save, so the default
     // refetch type would skip it and changes would pop in after arriving back. Returning the promise waits for it.
     onSuccess: () => queryClient.invalidateQueries({ queryKey: coursesQueryKey, refetchType: 'all' }),
   })
 
-  async function save(input: CourseInput) {
+  async function save(input: CourseInput, image?: File) {
     // The form shows the failure from saveFailed, and a rejection here would go unhandled.
-    const saved = await mutateAsync(input).catch(() => null)
+    const saved = await mutateAsync({ input, image }).catch(() => null)
     if (saved) {
       await navigate('/')
     }

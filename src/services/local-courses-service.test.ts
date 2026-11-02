@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CourseInput } from '../domain/course'
+import { createMemoryImageStore } from '../test/memory-image-store'
 import type { CoursesService } from './courses-service'
 import { writeFailureSwitch } from './failure-switches'
 import { createLocalCoursesService } from './local-courses-service'
@@ -17,11 +18,23 @@ const input: CourseInput = {
 
 const clockStart = Date.parse('2026-10-29T12:00:00Z')
 
+let imageStore = createMemoryImageStore()
+
 function createService(now = () => clockStart) {
-  return createLocalCoursesService({ latency: () => 0, now })
+  return createLocalCoursesService({ latency: () => 0, now, images: imageStore.store })
 }
 
-beforeEach(() => localStorage.clear())
+function image(name = 'adare.jpg') {
+  return new File(['photo'], name, { type: 'image/jpeg' })
+}
+
+beforeEach(() => {
+  localStorage.clear()
+  imageStore = createMemoryImageStore()
+})
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 describe('seed data', () => {
   it('seeds six courses on first run', async () => {
@@ -108,19 +121,144 @@ describe('get', () => {
   })
 })
 
-describe('image urls', () => {
-  it('resolves a seed image to its static path', async () => {
+describe('images', () => {
+  it('resolves a seed image to its static path and file name without storing it', async () => {
     const service = createService()
     const { id } = await service.create({ ...input, imageId: 'seed:pebble-beach' })
 
-    expect((await service.list()).find((course) => course.id === id)?.imageUrl).toBe('/seed/pebble-beach.jpg')
+    expect((await service.list()).find((course) => course.id === id)).toMatchObject({
+      imageUrl: '/seed/pebble-beach.jpg',
+      imageName: 'pebble-beach.jpg',
+    })
+    expect(imageStore.files.size).toBe(0)
   })
 
   it('resolves a course without an image to null', async () => {
     const service = createService()
     const { id } = await service.create(input)
 
-    expect((await service.list()).find((course) => course.id === id)?.imageUrl).toBeNull()
+    expect((await service.list()).find((course) => course.id === id)).toMatchObject({ imageUrl: null, imageName: null })
+  })
+
+  it('stores an uploaded image under the course imageId and resolves it after a refresh', async () => {
+    const created = await createService().create(input, image())
+
+    expect([...imageStore.files.keys()]).toEqual([created.imageId])
+    expect(created).toMatchObject({ imageUrl: expect.stringMatching(/^blob:/), imageName: 'adare.jpg' })
+
+    const reloaded = await createService().get(created.id)
+    expect(reloaded).toMatchObject({ imageId: created.imageId, imageUrl: expect.stringMatching(/^blob:/), imageName: 'adare.jpg' })
+  })
+
+  it('creates one object URL per image and reuses it', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+
+    expect((await service.get(created.id))?.imageUrl).toBe(created.imageUrl)
+    expect((await service.list()).find((course) => course.id === created.id)?.imageUrl).toBe(created.imageUrl)
+  })
+
+  it('resolves a course whose image is missing from storage to null', async () => {
+    const created = await createService().create(input, image())
+    imageStore.files.clear()
+
+    expect(await createService().get(created.id)).toMatchObject({ imageId: created.imageId, imageUrl: null, imageName: null })
+  })
+
+  it('deletes and revokes the old image when an image is replaced', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+
+    const updated = await service.update(created.id, created, image('new.jpg'))
+
+    expect(updated.imageName).toBe('new.jpg')
+    expect([...imageStore.files.keys()]).toEqual([updated.imageId])
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(created.imageUrl)
+  })
+
+  it('keeps the image when a course is updated without a new one', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+
+    const updated = await service.update(created.id, { ...created, name: 'Renamed' })
+
+    expect(updated).toMatchObject({ imageId: created.imageId, imageUrl: created.imageUrl })
+    expect([...imageStore.files.keys()]).toEqual([created.imageId])
+  })
+
+  it('keeps the stored image when an update without a new one sends another imageId', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+
+    const updated = await service.update(created.id, { ...created, imageId: 'stale' })
+
+    expect(updated).toMatchObject({ imageId: created.imageId, imageUrl: created.imageUrl })
+    expect([...imageStore.files.keys()]).toEqual([created.imageId])
+  })
+
+  it('removes the new image again when the course cannot be written', async () => {
+    const service = createService()
+    const [first] = await service.list()
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError')
+    })
+
+    await expect(service.create(input, image())).rejects.toThrow('Quota exceeded')
+    await expect(service.update(first.id, first, image())).rejects.toThrow('Quota exceeded')
+
+    expect(imageStore.files.size).toBe(0)
+  })
+
+  it('still saves when the replaced image cannot be deleted, and logs it', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+    vi.spyOn(imageStore.store, 'del').mockRejectedValueOnce(new Error('IndexedDB closed'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const updated = await service.update(created.id, created, image('new.jpg'))
+
+    expect(updated.imageName).toBe('new.jpg')
+    expect((await service.get(created.id))?.imageName).toBe('new.jpg')
+    expect(log).toHaveBeenCalledWith(`Couldn't delete image ${created.imageId}`, expect.any(Error))
+  })
+
+  it('deletes and revokes the image when its course is removed', async () => {
+    const service = createService()
+    const created = await service.create(input, image())
+
+    await service.remove(created.id)
+
+    expect(imageStore.files.size).toBe(0)
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(created.imageUrl)
+  })
+
+  it('rejects an image that is not JPG, PNG or WebP and stores nothing', async () => {
+    const service = createService()
+    const before = await service.list()
+    const gif = new File(['gif'], 'animation.gif', { type: 'image/gif' })
+
+    await expect(service.create(input, gif)).rejects.toThrow('Only JPG, PNG or WebP images are allowed')
+    await expect(service.update(before[0].id, before[0], gif)).rejects.toThrow()
+
+    expect(imageStore.files.size).toBe(0)
+    expect(await service.list()).toEqual(before)
+  })
+
+  it('stores no image when the save fails', async () => {
+    const service = createService()
+    const [first] = await service.list()
+    writeFailureSwitch('saves', true)
+
+    await expect(service.create(input, image())).rejects.toThrow()
+    await expect(service.update(first.id, first, image())).rejects.toThrow()
+
+    expect(imageStore.files.size).toBe(0)
+  })
+
+  it('stores no image when the course input is invalid', async () => {
+    await expect(createService().create({ ...input, name: '' }, image())).rejects.toThrow()
+
+    expect(imageStore.files.size).toBe(0)
   })
 })
 

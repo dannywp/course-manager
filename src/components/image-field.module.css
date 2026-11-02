@@ -1,0 +1,75 @@
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  width: 100%;
+  height: 216px;
+  padding: var(--space-16);
+  border: var(--space-1) solid var(--color-light-gray);
+  border-radius: var(--radius-md);
+  outline: 0;
+  background: var(--color-light-gray);
+  color: var(--color-dark-gray);
+  cursor: pointer;
+}
+
+.dropZone:hover {
+  border-color: var(--color-dark-gray);
+}
+
+.dropZone:focus-visible,
+.dropZone[data-dragging] {
+  border-color: var(--color-orange);
+  box-shadow: var(--focus-glow);
+}
+
+.dropZone[data-dragging] {
+  background: var(--color-lighter-gray);
+}
+
+.title {
+  font: var(--font-body-bold);
+}
+
+.hint {
+  font: var(--font-label);
+}
+
+.file,
+.fileSkeleton {
+  width: min(312px, 100%);
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-12);
+}
+
+.fileSkeleton {
+  composes: skeleton from './course-card.module.css';
+}
+
+.thumbnail {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  margin-right: var(--space-16);
+  overflow: hidden;
+  font: var(--font-body-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

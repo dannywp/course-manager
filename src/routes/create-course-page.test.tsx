@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { coursesService } from '../services/courses-service'
 import { writeFailureSwitch } from '../services/failure-switches'
 import { createGate } from '../test/create-gate'
-import { field, listHeading, preview, type } from '../test/form-queries'
+import { chooseFile, field, listHeading, preview, type } from '../test/form-queries'
 import { renderApp } from '../test/render-app'
 
 const saveButton = () => screen.getByRole('button', { name: 'Save' })
@@ -129,16 +129,19 @@ describe('saving', () => {
     fireEvent.click(saveButton())
 
     await listHeading()
-    expect(create).toHaveBeenCalledExactlyOnceWith({
-      name: 'Adare Manor',
-      city: 'Adare',
-      countryCode: 'IE',
-      par: 72,
-      difficulty: 3,
-      featured: true,
-      description: 'Parkland',
-      imageId: null,
-    })
+    expect(create).toHaveBeenCalledExactlyOnceWith(
+      {
+        name: 'Adare Manor',
+        city: 'Adare',
+        countryCode: 'IE',
+        par: 72,
+        difficulty: 3,
+        featured: true,
+        description: 'Parkland',
+        imageId: null,
+      },
+      undefined,
+    )
   })
 
   it.each([
@@ -331,5 +334,131 @@ describe('live preview', () => {
     type('Difficulty*', '')
 
     expect(preview().getByText('Difficulty: –/5')).toBeInTheDocument()
+  })
+})
+
+describe('image', () => {
+  const dropZone = () => screen.getByRole('button', { name: 'Drag & Drop' })
+  const changeImage = () => screen.getByRole('button', { name: 'Change image' })
+  const photo = (name = 'adare.jpg', type = 'image/jpeg', size = 1) => new File([new Uint8Array(size)], name, { type })
+  const drop = (target: HTMLElement, ...files: File[]) => fireEvent.drop(target, { dataTransfer: { files } })
+
+  it('shows a chosen file as a row with its name, and in the preview before saving', async () => {
+    await renderForm()
+
+    chooseFile(dropZone(), photo())
+
+    expect(screen.getByText('adare.jpg')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Drag & Drop' })).not.toBeInTheDocument()
+    expect(preview().getByRole('presentation')).toHaveAttribute('src', expect.stringMatching(/^blob:/))
+  })
+
+  it('moves focus to the change button once a file is chosen', async () => {
+    await renderForm()
+    dropZone().focus()
+
+    chooseFile(dropZone(), photo())
+
+    await waitFor(() => expect(changeImage()).toHaveFocus())
+  })
+
+  it('takes the first of several dropped files', async () => {
+    await renderForm()
+
+    drop(dropZone(), photo('first.jpg'), photo('second.png', 'image/png'))
+
+    expect(screen.getByText('first.jpg')).toBeInTheDocument()
+    expect(screen.queryByText('second.png')).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['a GIF', photo('animation.gif', 'image/gif'), 'Only JPG, PNG or WebP images are allowed'],
+    ['a PDF', photo('scorecard.pdf', 'application/pdf'), 'Only JPG, PNG or WebP images are allowed'],
+    ['a file over 5 MB', photo('huge.jpg', 'image/jpeg', 5 * 1024 * 1024 + 1), 'Keep the image to 5 MB or less'],
+  ])('rejects %s on the drop zone', async (_, file, message) => {
+    await renderForm()
+
+    drop(dropZone(), file)
+
+    expect(screen.getByRole('alert')).toHaveTextContent(message)
+    expect(dropZone()).toHaveAccessibleDescription(expect.stringContaining(message))
+    expect(preview().getByRole('presentation')).toHaveAttribute('src', '/placeholder.png')
+  })
+
+  it('keeps the chosen image when the replacement is rejected, and clears the error on a valid one', async () => {
+    await renderForm()
+    drop(dropZone(), photo())
+    const chosenUrl = preview().getByRole('presentation').getAttribute('src')
+
+    chooseFile(changeImage(), photo('scorecard.pdf', 'application/pdf'))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Only JPG, PNG or WebP images are allowed')
+    expect(screen.getByText('adare.jpg')).toBeInTheDocument()
+    expect(preview().getByRole('presentation')).toHaveAttribute('src', chosenUrl)
+
+    chooseFile(changeImage(), photo('valderrama.webp', 'image/webp'))
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByText('valderrama.webp')).toBeInTheDocument()
+  })
+
+  it('revokes the preview of a replaced file, and of the last one when the form closes', async () => {
+    await renderForm()
+    drop(dropZone(), photo('first.jpg'))
+    const firstUrl = preview().getByRole('presentation').getAttribute('src')
+
+    chooseFile(changeImage(), photo('second.jpg'))
+    const secondUrl = preview().getByRole('presentation').getAttribute('src')
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(firstUrl)
+    expect(URL.revokeObjectURL).not.toHaveBeenCalledWith(secondUrl)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await listHeading()
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(secondUrl)
+  })
+
+  it('shows the placeholder in the file row when the chosen file cannot be shown', async () => {
+    await renderForm()
+    drop(dropZone(), photo())
+    const thumbnail = within(screen.getByText('adare.jpg').parentElement!).getByRole('presentation')
+
+    fireEvent.error(thumbnail)
+
+    expect(thumbnail).toHaveAttribute('src', '/placeholder.png')
+  })
+
+  it('refuses a file dragged onto the file row, so the browser does not open it', async () => {
+    await renderForm()
+    drop(dropZone(), photo())
+    const row = screen.getByText('adare.jpg')
+    const dataTransfer = { dropEffect: 'copy', files: [photo('other.jpg')] }
+
+    expect(fireEvent.dragOver(row, { dataTransfer })).toBe(false)
+    expect(dataTransfer.dropEffect).toBe('none')
+    expect(fireEvent.drop(row, { dataTransfer })).toBe(false)
+    expect(screen.getByText('adare.jpg')).toBeInTheDocument()
+  })
+
+  it('keeps accepting a file dragged over the drop zone', async () => {
+    await renderForm()
+    const dataTransfer = { dropEffect: 'copy' }
+
+    expect(fireEvent.dragOver(dropZone(), { dataTransfer })).toBe(false)
+    expect(dataTransfer.dropEffect).toBe('copy')
+  })
+
+  it('saves the chosen image with the course and shows it on the card', async () => {
+    const create = vi.spyOn(coursesService, 'create')
+    await renderForm()
+    fillValidCourse()
+    const file = photo()
+    drop(dropZone(), file)
+
+    fireEvent.click(saveButton())
+
+    await listHeading()
+    expect(create).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ imageId: null }), file)
+    const card = (await screen.findByRole('heading', { level: 2, name: 'Adare Manor' })).closest('article') as HTMLElement
+    expect(within(card).getByRole('presentation')).toHaveAttribute('src', expect.stringMatching(/^blob:/))
   })
 })

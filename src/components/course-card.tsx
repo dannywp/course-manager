@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { CourseWithImage } from '../domain/course'
+import { useImageFallback } from '../hooks/use-image-fallback'
 import styles from './course-card.module.css'
 
 type CourseCardProps = {
@@ -10,15 +11,14 @@ type CourseCardProps = {
 
 export function CourseCard({ course, actions }: CourseCardProps) {
   const { name, city, countryCode, par, difficulty, featured, imageUrl } = course
-  const [failedUrl, setFailedUrl] = useState<string | null>(null)
-  const src = imageUrl === null || imageUrl === failedUrl ? '/placeholder.png' : imageUrl
+  const image = useImageFallback(imageUrl)
   const location = `${city?.trim() || 'City'}, ${countryCode || 'Country'}`
   const title = name?.trim()
 
   return (
     <article className={styles.card}>
       <div className={styles.image}>
-        <img className={styles.photo} src={src} alt="" loading="lazy" onError={() => setFailedUrl(imageUrl)} />
+        <img className={styles.photo} src={image.src} alt="" loading="lazy" onError={image.onError} />
         {featured && (
           <span className={styles.badge}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" focusable="false">

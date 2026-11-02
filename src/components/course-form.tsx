@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useId, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { useForm, useWatch, type Control } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { countries } from '../domain/countries'
@@ -9,11 +9,12 @@ import { CourseCard } from './course-card'
 import { CourseCardSkeleton } from './course-card-skeleton'
 import styles from './course-form.module.css'
 import { CheckboxField, CheckboxSkeleton, FieldSkeleton, SelectField, TextAreaField, TextField } from './form-fields'
+import { ImageField, ImageFieldSkeleton } from './image-field'
 
 type CourseFormProps = {
   course?: CourseWithImage
   saveFailed: boolean
-  onSubmit: (input: CourseInput) => Promise<void>
+  onSubmit: (input: CourseInput, image?: File) => Promise<void>
 }
 
 const detailsHeading = (
@@ -24,6 +25,8 @@ const detailsHeading = (
 )
 
 const locationHeading = <h2 className={styles.heading}>Location</h2>
+
+const imageHeading = <h2 className={styles.heading}>Image</h2>
 
 function PreviewPanel({ children }: { children: ReactNode }) {
   const labelId = useId()
@@ -81,6 +84,10 @@ export function CourseFormSkeleton() {
               <FieldSkeleton />
             </div>
           </section>
+          <section className={styles.section}>
+            {imageHeading}
+            <ImageFieldSkeleton />
+          </section>
         </div>
         <PreviewPanel>
           <CourseCardSkeleton />
@@ -101,9 +108,31 @@ export function CourseForm({ course, saveFailed, onSubmit }: CourseFormProps) {
     resolver: zodResolver(courseInputSchema),
     defaultValues: course ?? { name: '', city: '', featured: false, description: '', imageId: null },
   })
+  const [selectedImage, setSelectedImage] = useState<{ file: File; url: string } | null>(null)
+
+  useEffect(() => {
+    if (selectedImage) {
+      return () => URL.revokeObjectURL(selectedImage.url)
+    }
+  }, [selectedImage])
+
+  const storedImage = course?.imageUrl && course.imageName ? { url: course.imageUrl, name: course.imageName } : null
+  const image = selectedImage ? { url: selectedImage.url, name: selectedImage.file.name } : storedImage
 
   return (
-    <form noValidate autoComplete="off" onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
+    <form
+      noValidate
+      autoComplete="off"
+      onSubmit={(event) => void handleSubmit((input) => onSubmit(input, selectedImage?.file))(event)}
+      // Browsers open a file dropped where nothing accepts it, which would throw away the form.
+      onDragOver={(event) => {
+        if (!event.isDefaultPrevented()) {
+          event.preventDefault()
+          event.dataTransfer.dropEffect = 'none'
+        }
+      }}
+      onDrop={(event) => event.preventDefault()}
+    >
       <div className={styles.actions}>
         <button
           type="button"
@@ -170,8 +199,12 @@ export function CourseForm({ course, saveFailed, onSubmit }: CourseFormProps) {
               </SelectField>
             </div>
           </section>
+          <section className={styles.section}>
+            {imageHeading}
+            <ImageField image={image} onSelect={(file) => setSelectedImage({ file, url: URL.createObjectURL(file) })} />
+          </section>
         </div>
-        <CoursePreview control={control} imageUrl={course?.imageUrl ?? null} />
+        <CoursePreview control={control} imageUrl={image?.url ?? null} />
       </div>
     </form>
   )

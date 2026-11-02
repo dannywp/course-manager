@@ -4,7 +4,7 @@ import { coursesQueryKey } from '../hooks/use-courses-query'
 import { coursesService } from '../services/courses-service'
 import { writeFailureSwitch } from '../services/failure-switches'
 import { createGate } from '../test/create-gate'
-import { field, listHeading, preview, type } from '../test/form-queries'
+import { chooseFile, field, listHeading, preview, type } from '../test/form-queries'
 import { renderApp } from '../test/render-app'
 
 const save = () => fireEvent.click(screen.getByRole('button', { name: 'Save' }))
@@ -146,16 +146,20 @@ describe('saving', () => {
     save()
 
     await listHeading()
-    expect(update).toHaveBeenCalledExactlyOnceWith(course.id, {
-      name: 'Real Club Valderrama',
-      city: course.city,
-      countryCode: course.countryCode,
-      par: course.par,
-      difficulty: course.difficulty,
-      featured: false,
-      description: course.description,
-      imageId: 'seed:valderrama',
-    })
+    expect(update).toHaveBeenCalledExactlyOnceWith(
+      course.id,
+      {
+        name: 'Real Club Valderrama',
+        city: course.city,
+        countryCode: course.countryCode,
+        par: course.par,
+        difficulty: course.difficulty,
+        featured: false,
+        description: course.description,
+        imageId: 'seed:valderrama',
+      },
+      undefined,
+    )
   })
 
   it('places a newly featured course last among the featured courses', async () => {
@@ -236,5 +240,35 @@ describe('saving', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save the course. Your changes are still here.")
     expect(field('Title*')).toHaveValue('Real Club Valderrama')
     expect(await coursesService.get(course.id)).toMatchObject({ name: 'Valderrama' })
+  })
+})
+
+describe('image', () => {
+  const photo = (name: string) => new File(['photo'], name, { type: 'image/jpeg' })
+
+  it('shows the stored image name and photo when the form opens', async () => {
+    const { id, ...valderrama } = await findCourse('Valderrama')
+    const updated = await coursesService.update(id, valderrama, photo('cork-oaks.jpg'))
+
+    await openEdit('Valderrama')
+
+    expect(screen.getByText('cork-oaks.jpg')).toBeInTheDocument()
+    expect(preview().getByRole('presentation')).toHaveAttribute('src', updated.imageUrl)
+  })
+
+  it('shows the seed image file name for a seed course', async () => {
+    await openEdit('Valderrama')
+
+    expect(screen.getByText('valderrama.jpg')).toBeInTheDocument()
+  })
+
+  it('replaces the stored image on save', async () => {
+    await openEdit('Valderrama')
+    chooseFile(screen.getByRole('button', { name: 'Change image' }), photo('cork-oaks.jpg'))
+
+    save()
+
+    await listHeading()
+    expect(await findCourse('Valderrama')).toMatchObject({ imageName: 'cork-oaks.jpg' })
   })
 })
