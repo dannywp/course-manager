@@ -10,6 +10,7 @@ export const routes: RouteObject[] = [
       { index: true, lazy: () => import('./routes/courses-page') },
       { path: 'courses/new', lazy: () => import('./routes/create-course-page') },
       { path: 'courses/:id/edit', lazy: () => import('./routes/edit-course-page') },
+      { path: '*', lazy: () => import('./routes/not-found-page') },
     ],
   },
 ]

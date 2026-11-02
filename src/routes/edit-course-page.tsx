@@ -1,6 +1,7 @@
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import buttonStyles from '../components/button.module.css'
 import { CourseForm, CourseFormSkeleton } from '../components/course-form'
+import { NotFoundMessage } from '../components/not-found-message'
 import { PageHeader } from '../components/page-header'
 import messageStyles from '../components/page-message.module.css'
 import { useCourseQuery } from '../hooks/use-course-query'
@@ -17,14 +18,7 @@ function CourseState({ id }: { id: string }) {
   }
 
   if (course === null) {
-    return (
-      <div className={messageStyles.message}>
-        <p>Course not found</p>
-        <Link to="/" className={buttonClass}>
-          Back to courses
-        </Link>
-      </div>
-    )
+    return <NotFoundMessage message="Course not found" />
   }
 
   if (isError) {
