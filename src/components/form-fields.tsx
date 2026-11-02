@@ -4,7 +4,6 @@ import styles from './form-fields.module.css'
 type FieldProps = {
   label: string
   error?: string
-  hint?: string
   className?: string
 }
 
@@ -17,23 +16,21 @@ type ControlProps = {
 function Field({
   label,
   error,
-  hint,
   className = '',
   children,
 }: FieldProps & { children: (control: ControlProps) => ReactNode }) {
   const id = useId()
-  const messageId = useId()
-  const message = error ?? hint
+  const errorId = useId()
 
   return (
     <div className={`${styles.field} ${className}`}>
-      {children({ id, 'aria-invalid': error !== undefined, 'aria-describedby': message ? messageId : undefined })}
+      {children({ id, 'aria-invalid': error !== undefined, 'aria-describedby': error ? errorId : undefined })}
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>
-      {message && (
-        <p id={messageId} className={error ? styles.error : styles.hint}>
-          {message}
+      {error && (
+        <p id={errorId} className={styles.error}>
+          {error}
         </p>
       )}
     </div>
@@ -43,11 +40,10 @@ function Field({
 export function TextField({
   label,
   error,
-  hint,
   ...input
 }: Omit<FieldProps, 'className'> & Omit<ComponentProps<'input'>, 'className' | 'placeholder'>) {
   return (
-    <Field label={label} error={error} hint={hint}>
+    <Field label={label} error={error}>
       {(control) => <input type="text" {...input} {...control} className={styles.control} placeholder=" " />}
     </Field>
   )
@@ -58,7 +54,7 @@ export function TextAreaField({
   error,
   className,
   ...textarea
-}: Omit<FieldProps, 'hint'> & Omit<ComponentProps<'textarea'>, 'className' | 'placeholder'>) {
+}: FieldProps & Omit<ComponentProps<'textarea'>, 'className' | 'placeholder'>) {
   return (
     <Field label={label} error={error} className={className}>
       {(control) => (
@@ -88,11 +84,10 @@ export function SelectField({
   )
 }
 
-export function FieldSkeleton({ tall = false, withHint = false, className = '' }: { tall?: boolean; withHint?: boolean; className?: string }) {
+export function FieldSkeleton({ tall = false, className = '' }: { tall?: boolean; className?: string }) {
   return (
     <div className={`${styles.field} ${className}`}>
       <div className={`${styles.controlSkeleton} ${tall ? styles.tall : ''}`} />
-      {withHint && <p className={styles.hint}>&nbsp;</p>}
     </div>
   )
 }

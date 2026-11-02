@@ -106,16 +106,6 @@ describe('validation', () => {
     await waitFor(() => expect(field('Course description')).toHaveFocus())
     expect(create).not.toHaveBeenCalled()
   })
-
-  it('shows the typical par as a hint until there is an error', async () => {
-    await renderForm()
-    expect(field('Par*')).toHaveAccessibleDescription('Typical: 68–74')
-
-    fireEvent.click(saveButton())
-
-    await screen.findByText('Enter a par from 54 to 80')
-    expect(field('Par*')).toHaveAccessibleDescription('Enter a par from 54 to 80')
-  })
 })
 
 describe('saving', () => {

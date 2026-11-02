@@ -139,17 +139,9 @@
   background: var(--color-white);
 }
 
-.hint,
 .error {
   margin-top: var(--space-4);
   font: var(--font-label);
-}
-
-.hint {
-  color: var(--color-dark-gray);
-}
-
-.error {
   color: var(--color-text);
 }
 

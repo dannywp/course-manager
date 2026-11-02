@@ -73,7 +73,7 @@ export function CourseFormSkeleton() {
               <FieldSkeleton />
               <FieldSkeleton />
               <FieldSkeleton tall className={styles.wide} />
-              <FieldSkeleton withHint />
+              <FieldSkeleton />
             </div>
             <CheckboxSkeleton />
           </section>
@@ -179,7 +179,6 @@ export function CourseForm({ course, saveFailed, onSubmit }: CourseFormProps) {
                 label="Par*"
                 inputMode="numeric"
                 required
-                hint="Typical: 68–74"
                 error={errors.par?.message}
                 {...register('par', { valueAsNumber: true })}
               />
