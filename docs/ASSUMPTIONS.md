@@ -87,3 +87,10 @@ Each entry is written as **Question → Assumption**.
 53. Text field focus. → The orange border and glow of Figma's focused select, and the label floats on focus so it doesn't overlap typing.
 54. Par input. → A text input with a numeric keyboard, so there are no spinners and scrolling can't change the value. The "Typical: 68–74" hint sits under the field, so Featured sits about 20px lower than in Figma.
 55. Fields while saving. → They stay editable, and only Save and Cancel are disabled. Disabling a focused field drops keyboard focus to the page when a save fails. Cancel can't stop a save that has started, so it's disabled rather than left to imply it can. A save also finishes if the user leaves with the browser's Back button, and it then returns them to the list.
+
+**Edit course**
+
+56. Edit loading state. → A skeleton built from the form's own layout and the card skeleton, so the page doesn't move when the course arrives. The action bar is empty until then.
+57. Opening the edit page. → It always loads the course fresh, so the loading state shows on every visit. The form reads its values once when it mounts, so a cached copy could prefill it with old data and overwrite newer values.
+58. Edit not-found and error states. → "Course not found" with a "Back to courses" link, and "Couldn't load the course" with Retry, as on the list.
+59. A course's image while editing. → The preview shows it and saving keeps it. Changing it arrives in Slice 6.

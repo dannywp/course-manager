@@ -208,3 +208,31 @@ Time: 1.5 hours
 **Takeaway:** a guarantee has to be checked at its boundaries. "Save is disabled while saving" sounded complete, but two separate state updates left a gap between them. Looking at the screen also still mattered: green tests couldn't show that an option had reappeared in a list.
 
 Time: 1 hour
+
+## 2026-11-02: Slice 5, edit course
+
+**Tools:** Claude Code (Opus), the Playwright MCP and the `reviewer` subagent.
+
+**What the agent did:**
+- Proposed a plan with four decisions for me. I chose a skeleton for the loading state, and required it to match the real page's dimensions exactly. I also asked for a shared hook so create and edit don't each have their own save flow.
+- Replaced the create mutation with a shared `useSaveCourse`. It calls `update` or `create`, refreshes the list and the course together through the `['courses']` key prefix, and returns to the list.
+- Built the edit page with loading, not-found and error states. The form takes the stored course for its starting values and the preview photo, and saving keeps the stored image.
+- Loaded the course fresh on every visit (`gcTime: 0`). The form reads its values once, so a cached copy could prefill it with old data.
+- Built the skeleton from the form's own layout classes and the existing card skeleton, then measured it in Chromium against the loaded page: identical at 1440, 800, 402 and 320px, down to the page height.
+- Checked in Chromium at real latency:
+  - a bogus URL
+  - "fail list" with Retry
+  - featuring and unfeaturing a course
+  - reopening, and surviving a reload
+  - create through the shared hook
+- Broke the code on purpose in 25 ways on a scratch copy to confirm the tests catch each one.
+
+**Review and corrections**
+- The `reviewer` found that nothing tested what happens when a background refresh fails while the form holds data. Putting the error check first would have replaced the form and lost the user's edits. There's now a test for it, plus one for a save whose list refresh fails.
+- It also found that the skeleton repeated the field heights, so the matched layout could break silently. The heights are now defined once for both. The checkbox placeholder reuses the card skeleton's bar style, and two tests that repeated other tests were removed.
+- The review was cut off by a usage limit and resumed from its saved progress.
+- The `a11y-auditor` didn't run, as I decided in Slice 3.
+
+**Takeaway:** an order that looks arbitrary in code (checking for data before checking for an error) can be what protects the user's work. Only a test that sets up the failure keeps it from being "tidied" back.
+
+Time: 30 minutes

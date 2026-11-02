@@ -93,10 +93,10 @@ The service plays the role of the server. Business rules live in it, so no compo
 - [x] [N] Schema test for par and difficulty bounds and name trimming.
 
 ## Slice 5: Edit course [C]
-- [ ] Edit route loads `service.get(id)` and prefills the form. AC: every field shows the stored value.
-- [ ] Edit loading, not-found and error states. AC: `/courses/bogus/edit` shows "Course not found" with a link back. With "fail list" on, the error state shows with Retry.
-- [ ] Update goes through `service.update`, which applies the featured rules. AC: featuring an existing course during edit places it last among featured courses after save.
-- [ ] After update, invalidate the list and the course's detail query, then return to the list. AC: the edited values show, and reopening the edit page shows the new values.
+- [x] Edit route loads `service.get(id)` and prefills the form. AC: every field shows the stored value.
+- [x] Edit loading, not-found and error states. AC: `/courses/bogus/edit` shows "Course not found" with a link back. With "fail list" on, the error state shows with Retry.
+- [x] Update goes through `service.update`, which applies the featured rules. AC: featuring an existing course during edit places it last among featured courses after save.
+- [x] After update, invalidate the list and the course's detail query, then return to the list. AC: the edited values show, and reopening the edit page shows the new values.
 
 ## Slice 6: Image handling with IndexedDB persistence [C]
 - [ ] Image blobs are stored in IndexedDB with `idb-keyval`, keyed by `imageId`. Course records store only the `imageId`. AC: after a refresh, uploaded images still render on cards and in the edit form.
