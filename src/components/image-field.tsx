@@ -17,8 +17,6 @@ export function ImageField({ image, onSelect }: ImageFieldProps) {
   const focusChangeButton = useRef(false)
   const [error, setError] = useState<string | null>(null)
   const [dragging, setDragging] = useState(false)
-  const titleId = useId()
-  const hintId = useId()
   const errorId = useId()
   const hasImage = image !== null
   const thumbnail = useImageFallback(image?.url ?? null)
@@ -88,8 +86,7 @@ export function ImageField({ image, onSelect }: ImageFieldProps) {
           type="button"
           className={styles.dropZone}
           data-dragging={dragging || undefined}
-          aria-labelledby={titleId}
-          aria-describedby={error ? `${errorId} ${hintId}` : hintId}
+          aria-describedby={error ? errorId : undefined}
           onClick={() => inputRef.current!.click()}
           onDragEnter={(event) => event.preventDefault()}
           onDragOver={(event) => {
@@ -102,12 +99,8 @@ export function ImageField({ image, onSelect }: ImageFieldProps) {
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false">
             <path d="M10 24H8.5a6.5 6.5 0 0 1-.9-12.94A9 9 0 0 1 25 11.5a6.25 6.25 0 0 1-.5 12.5H22M16 27V15m-4.5 4.5L16 15l4.5 4.5" />
           </svg>
-          <span id={titleId} className={styles.title}>
-            Drag & Drop
-          </span>
-          <span id={hintId} className={styles.hint}>
-            Drag & drop or click to browse. JPG, PNG or WebP, max 5 MB.
-          </span>
+          <span className={styles.title}>Drag & Drop</span>
+          <span className={styles.hint}>Drag & drop or click to browse. JPG, PNG or WebP, max 5 MB.</span>
         </button>
       )}
       {error && (

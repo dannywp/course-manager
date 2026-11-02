@@ -16,3 +16,9 @@ h2,
 p {
   margin: 0;
 }
+
+:focus-visible {
+  outline: var(--space-1) solid var(--color-orange);
+  outline-offset: var(--space-1);
+  box-shadow: var(--focus-glow);
+}

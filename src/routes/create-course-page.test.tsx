@@ -338,7 +338,7 @@ describe('live preview', () => {
 })
 
 describe('image', () => {
-  const dropZone = () => screen.getByRole('button', { name: 'Drag & Drop' })
+  const dropZone = () => screen.getByRole('button', { name: /^Drag & Drop/ })
   const changeImage = () => screen.getByRole('button', { name: 'Change image' })
   const photo = (name = 'adare.jpg', type = 'image/jpeg', size = 1) => new File([new Uint8Array(size)], name, { type })
   const drop = (target: HTMLElement, ...files: File[]) => fireEvent.drop(target, { dataTransfer: { files } })
@@ -349,7 +349,7 @@ describe('image', () => {
     chooseFile(dropZone(), photo())
 
     expect(screen.getByText('adare.jpg')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Drag & Drop' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Drag & Drop/ })).not.toBeInTheDocument()
     expect(preview().getByRole('presentation')).toHaveAttribute('src', expect.stringMatching(/^blob:/))
   })
 

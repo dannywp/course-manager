@@ -19,12 +19,6 @@
   filter: brightness(0.9);
 }
 
-.button:focus-visible {
-  outline: var(--space-1) solid var(--color-orange);
-  outline-offset: var(--space-1);
-  box-shadow: var(--focus-glow);
-}
-
 .button:disabled {
   background: var(--color-gray);
   filter: none;

@@ -44,7 +44,5 @@
 }
 
 .item:focus-visible {
-  outline: var(--space-1) solid var(--color-orange);
   outline-offset: calc(-1 * var(--space-1));
-  box-shadow: var(--focus-glow);
 }

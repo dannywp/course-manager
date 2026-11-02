@@ -11,14 +11,9 @@
 
 .summary {
   padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-md);
   font: var(--font-body-bold);
   cursor: pointer;
-}
-
-.summary:focus-visible {
-  border-radius: var(--radius-md);
-  outline: var(--space-1) solid var(--color-orange);
-  box-shadow: var(--focus-glow);
 }
 
 .fieldset {
