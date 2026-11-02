@@ -106,3 +106,10 @@ Each entry is written as **Question → Assumption**.
 66. Drop-zone contrast. → The Figma colours are kept, although #7B7B7B text on #E0E0E0 is 3.2:1, below the 4.5:1 minimum. It's left for the accessibility review after the project.
 67. Removing an image. → Out of scope. An image can be replaced but not removed, because neither the brief nor Figma has a control for it.
 68. Edit loading skeleton. → It has the file row's shape, because most courses have an image. For a course without one, the page grows by the drop zone's extra height when the course arrives.
+
+**Polish**
+
+69. Colour contrast. → axe's `color-contrast` rule fails on the Figma colours on every page: white on the orange buttons (3.18:1), #A0A0A0 location text and field labels (2.61:1), #7B7B7B card details (4.23:1) and form explainer (3.88:1), and the red Delete button (4.33:1). The colours are kept, and the e2e axe check turns off only that rule. Like #66, they're left for the accessibility review after the project.
+70. Offline indicator. → Not in Figma. An "Offline" badge at the right of the top nav, styled like the FEATURED badge, shows while the browser reports no connection. Screen readers announce it. The app keeps working offline, because courses and images are stored in the browser.
+71. What works offline. → The service worker caches the whole built app: every route, the Latin Inter fonts, the seed images and the placeholder. So the forms open offline too, not only the list. There is no web app manifest, because the brief asks for offline use, not installing. The service worker only runs in production builds (`npm run build && npm run preview`), so `npm run dev` and the e2e tests are never served from the cache.
+72. A new version while the app is open. → Once the new service worker has installed, which is a few seconds after the app opens, the open tab reloads. Otherwise the old page would ask for old route files that the new cache and the server no longer have. Anything typed into a form in those seconds is lost.

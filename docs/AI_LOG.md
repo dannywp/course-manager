@@ -275,3 +275,34 @@ Time: 30 minutes
 **Takeaway:** scripted browser events prove the app's own handlers, but skip what the browser does by default. The drop that loses the form was only found by reading the code.
 
 Time: about 1 hour
+
+## 2026-11-02: Slice 7, polish
+
+**Tools:** Claude Code (Opus), the Playwright MCP and the `reviewer` subagent.
+
+**What the agent did:**
+- Ran axe on six app states before planning. Besides the Figma colours failing contrast, it found that the drop zone's name left out its visible hint text.
+- Proposed a plan with four questions for me. I chose:
+  - to turn off only axe's contrast rule and keep the Figma colours (ASSUMPTIONS #69)
+  - to add `@axe-core/playwright`, so the axe check is a repeatable test
+  - to add `vite-plugin-pwa` rather than write the service worker by hand
+  - to leave the two accessibility findings from Slice 2 for the review after the project
+- Wrote an e2e test of the core flow: create a featured course with an image, check the order, reload, check the image, delete. A reload while the delete is still running would cancel it, so Playwright's fake clock skips the simulated latency instead of the test waiting.
+- Added an axe test for four states, a service worker that caches the whole built app, and an "Offline" badge in the top nav, with its test written first.
+- Replaced four copies of the focus ring with one global rule, which also gave the Demo controls checkboxes the orange ring.
+- Broke the code on purpose 6 times on a scratch copy. The e2e tests caught each one, including removing the clock skip.
+- Checked in Chromium:
+  - an offline reload of the production build shows the list with images, fonts and the badge
+  - the badge leaves no horizontal scroll at 320px
+  - every focusable element shows the orange ring, in dev and production builds
+  - no animations run with reduced motion
+
+**Review and corrections**
+- One deliberate break proved nothing: an `aria-labelledby` pointing at a missing id is ignored, so the name didn't change. The agent noticed and re-ran it with the old markup, which the test caught.
+- The `reviewer` found that the global focus rule added an orange glow to options in an open select list. The Tab check never reached them, because options take focus with the arrow keys. Fixed and confirmed in Chromium.
+- It also found that a new deploy could break an open tab: the new service worker deleted old route files the page still needed, and the docs said otherwise. The app now registers through the plugin's own helper, which reloads the tab when a new version takes over. The agent served one build, replaced it with a second, and watched the tab reload into it (ASSUMPTIONS #72).
+- The `a11y-auditor` didn't run, as I decided in Slice 3.
+
+**Takeaway:** a global style reaches elements a manual check doesn't visit, and offline caching has to be tested across a deploy, not only on the first load. Offline worked on the first try. Only a second build showed the broken update.
+
+Time: 45 minutes
